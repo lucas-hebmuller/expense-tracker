@@ -13,6 +13,13 @@ target/
 .springBeans
 .sts4-cache
 
+### Environment Variables ###
+.env
+.env.local
+
+### Application Properties with Secrets ###
+**/application-local.properties
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
+
     List<Category> findByUser_Id(Long userId); // SELECT * FROM categories WHERE user_id = ?
 
     Optional<Category> findByNameAndUser_Id(String name, Long userId); // SELECT * FROM categories WHERE name = ?

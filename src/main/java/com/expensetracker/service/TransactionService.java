@@ -1,6 +1,8 @@
 package com.expensetracker.service;
 
+import com.expensetracker.model.Category;
 import com.expensetracker.model.Transaction;
+import com.expensetracker.repository.CategoryRepository;
 import com.expensetracker.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     private void validateTransaction(Transaction transaction) {
         if (transaction.getUser() == null || transaction.getUser().getId() == null) {
             throw new RuntimeException("Transaction must belong to a user!");
@@ -25,11 +30,16 @@ public class TransactionService {
             throw new RuntimeException("Transaction must belong to a category!");
         }
 
-        if (!Objects.equals(transaction.getUser().getId(), transaction.getCategory().getUser().getId())) {
+        Category category = categoryRepository.findById(transaction.getCategory().getId())
+                .orElseThrow(() -> new RuntimeException("Category not found!"));
+
+        if (!Objects.equals(transaction.getUser().getId(), category.getUser().getId())) {
             throw new RuntimeException("Cannot create transaction: Category (ID: " +
                     transaction.getCategory().getId() + ") does not belong to User (ID: " +
                     transaction.getUser().getId() + ")");
         }
+
+        transaction.setCategory(category);
     }
 
     public List<Transaction> getAllTransactions() {

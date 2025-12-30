@@ -2,6 +2,7 @@ package com.expensetracker.controller;
 
 import com.expensetracker.model.Transaction;
 import com.expensetracker.service.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+    public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody Transaction transaction) {
         try {
             Transaction createdTransaction = transactionService.createTransaction(transaction);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
@@ -52,7 +53,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @RequestBody Transaction transactionDetails) {
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @Valid @RequestBody Transaction transactionDetails) {
         try {
             Transaction updatedTransaction = transactionService.updateTransaction(id, transactionDetails);
             return ResponseEntity.ok(updatedTransaction);

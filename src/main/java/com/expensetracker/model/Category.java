@@ -2,6 +2,8 @@ package com.expensetracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "categories")
@@ -11,9 +13,12 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name cannot be blank!")
+    @Size(min = 2, max = 50, message = "Name must have between 2 and 50 characters.")
     @Column(nullable = false, length = 50)
     private String name;
 
+    @NotNull(message = "Category must belong to a user!")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"categories", "transactions"}) // Prevents circular reference

@@ -2,6 +2,7 @@ package com.expensetracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,20 +16,26 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 255, message = "Description cannot exceed 255 characters.")
     @Column(length = 255)
     private String description;
 
+    @NotNull(message = "Amount cannot be null!")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @NotNull(message = "Transaction date cannot be null!")
+    @PastOrPresent(message = "Transaction date cannot be in the future.")
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
+    @NotNull(message = "Transaction must belong to a user!")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"categories", "transactions"}) // Prevents circular reference
     private User user;
 
+    @NotNull(message = "Transaction must belong to a category!")
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     @JsonIgnoreProperties({"user"})

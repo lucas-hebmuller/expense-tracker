@@ -1,5 +1,7 @@
 package com.expensetracker.service;
 
+import com.expensetracker.exception.DuplicateEmailException;
+import com.expensetracker.exception.UserNotFoundException;
 import com.expensetracker.model.User;
 import com.expensetracker.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -30,7 +32,7 @@ public class UserService {
     @Transactional
     public User createUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists!");
+            throw new DuplicateEmailException(user.getEmail());
         }
 
         return userRepository.save(user);
@@ -39,7 +41,7 @@ public class UserService {
     @Transactional
     public User updateUser(Long id, User userDetails) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
@@ -51,7 +53,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         userRepository.delete(user);
     }

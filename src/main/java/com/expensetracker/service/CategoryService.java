@@ -1,5 +1,7 @@
 package com.expensetracker.service;
 
+import com.expensetracker.exception.CategoryNotFoundException;
+import com.expensetracker.exception.DuplicateCategoryException;
 import com.expensetracker.model.Category;
 import com.expensetracker.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
@@ -30,13 +32,13 @@ public class CategoryService {
     @Transactional
     public Category createCategory(Category category) {
         if (category.getUser() == null || category.getUser().getId() == null) {
-            throw new RuntimeException("Category must belong to a user!");
+            throw new IllegalArgumentException("Category must belong to a user!");
         }
 
         if (categoryRepository.findByNameAndUser_Id(
                 category.getName(),
                 category.getUser().getId()).isPresent()) {
-            throw new RuntimeException("Category already exists for this user!");
+            throw new DuplicateCategoryException(category.getName(), category.getUser().getId());
         }
 
         return categoryRepository.save(category);
@@ -45,7 +47,7 @@ public class CategoryService {
     @Transactional
     public Category updateCategory(Long id, Category categoryDetails) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(()-> new CategoryNotFoundException(id));
 
         category.setName(categoryDetails.getName());
         category.setUser(categoryDetails.getUser());
@@ -56,7 +58,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(()-> new CategoryNotFoundException(id));
 
         categoryRepository.delete(category);
     }

@@ -1,7 +1,10 @@
 package com.expensetracker.repository;
 
+import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -17,4 +20,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByUser_IdAndTransactionDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 
     List<Transaction> findByUser_IdAndCategory_Id(Long userId, Long categoryId);
+
+    @Query("SELECT new com.expensetracker.dto.MonthlySummaryDTO(" +
+            "EXTRACT(YEAR FROM t.transactionDate), " +
+            "EXTRACT(MONTH FROM t.transactionDate), " +
+            "COALESCE(SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END), 0), " +
+            "COALESCE(SUM(CASE WHEN t.amount < 0 THEN t.amount ELSE 0 END), 0), " +
+            "CAST(COUNT(t) AS integer)) " +
+            "FROM Transaction t " +
+            "WHERE t.user.id = :userId " +
+            "AND EXTRACT(YEAR FROM t.transactionDate) = :year " +
+            "AND EXTRACT(MONTH FROM t.transactionDate) = :month " +
+            "GROUP BY EXTRACT(YEAR FROM t.transactionDate), EXTRACT(MONTH FROM t.transactionDate)")
+    MonthlySummaryDTO getMonthlySummary(@Param("userId") Long userId,
+                                        @Param("year") Integer year,
+                                        @Param("month") Integer month);
+
 }

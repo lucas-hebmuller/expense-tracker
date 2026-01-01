@@ -1,5 +1,6 @@
 package com.expensetracker.controller;
 
+import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.model.Category;
 import com.expensetracker.service.CategoryService;
 import jakarta.validation.Valid;
@@ -31,38 +32,26 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Category category = categoryService.getCategoryById(id)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+        return ResponseEntity.ok(category);
     }
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category) {
-        try {
-            Category createdCategory = categoryService.createCategory(category);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Category createdCategory = categoryService.createCategory(category);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id, @Valid @RequestBody Category categoryDetails) {
-        try {
-            Category updatedCategory = categoryService.updateCategory(id, categoryDetails);
-            return ResponseEntity.ok(updatedCategory);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Category updatedCategory = categoryService.updateCategory(id, categoryDetails);
+        return ResponseEntity.ok(updatedCategory);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        try {
-            categoryService.deleteCategory(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

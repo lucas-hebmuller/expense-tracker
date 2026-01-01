@@ -1,5 +1,6 @@
 package com.expensetracker.controller;
 
+import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.model.Transaction;
 import com.expensetracker.service.TransactionService;
 import jakarta.validation.Valid;
@@ -37,38 +38,26 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
-        return transactionService.getTransactionById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Transaction transaction = transactionService.getTransactionById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
+        return ResponseEntity.ok(transaction);
     }
 
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody Transaction transaction) {
-        try {
-            Transaction createdTransaction = transactionService.createTransaction(transaction);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Transaction createdTransaction = transactionService.createTransaction(transaction);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @Valid @RequestBody Transaction transactionDetails) {
-        try {
-            Transaction updatedTransaction = transactionService.updateTransaction(id, transactionDetails);
-            return ResponseEntity.ok(updatedTransaction);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Transaction updatedTransaction = transactionService.updateTransaction(id, transactionDetails);
+        return ResponseEntity.ok(updatedTransaction);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
-        try {
-            transactionService.deleteTransaction(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.noContent().build();
     }
 }

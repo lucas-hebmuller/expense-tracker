@@ -1,5 +1,6 @@
 package com.expensetracker.controller;
 
+import com.expensetracker.exception.UserNotFoundException;
 import com.expensetracker.model.User;
 import com.expensetracker.service.UserService;
 import jakarta.validation.Valid;
@@ -25,38 +26,27 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        User user = userService.getUserById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        try {
-            User createdUser = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
-        try {
-            User updatedUser = userService.updateUser(id, userDetails);
-            return ResponseEntity.ok(updatedUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        User updatedUser = userService.updateUser(id, userDetails);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

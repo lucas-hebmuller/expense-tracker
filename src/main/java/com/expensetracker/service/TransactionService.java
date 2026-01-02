@@ -1,6 +1,7 @@
 package com.expensetracker.service;
 
 import com.expensetracker.dto.CategorySummaryDTO;
+import com.expensetracker.dto.DashboardDTO;
 import com.expensetracker.dto.DateRangeSummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.CategoryNotFoundException;
@@ -161,6 +162,42 @@ public class TransactionService {
         }
 
         return summary;
+    }
+
+    public DashboardDTO getDashboardStats(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        int currentYear = LocalDate.now().getYear();
+        int currentMonth = LocalDate.now().getMonthValue();
+
+        int lastYear;
+        int lastMonth;
+
+        if (currentMonth == 1) {
+            lastYear = currentYear - 1;
+            lastMonth = 12;
+        }
+        else {
+            lastYear = currentYear;
+            lastMonth = currentMonth - 1;
+        }
+
+        MonthlySummaryDTO currentMonthSummary = getMonthlySummary(userId, currentYear, currentMonth);
+        MonthlySummaryDTO lastMonthSummary = getMonthlySummary(userId, lastYear, lastMonth);
+
+        List<CategorySummaryDTO> categoriesSummary = getCategorySummary(userId);
+        CategorySummaryDTO topCategory = categoriesSummary.isEmpty() ? null : categoriesSummary.get(0);
+
+        Integer transactionCount = currentMonthSummary.getTransactionCount();
+
+        return new DashboardDTO(
+                currentMonthSummary,
+                lastMonthSummary,
+                topCategory,
+                transactionCount
+        );
     }
 
 }

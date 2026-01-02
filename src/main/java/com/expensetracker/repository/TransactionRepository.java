@@ -59,4 +59,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     DateRangeSummaryDTO getDateRangeSummary(@Param("userId") Long userId,
                                             @Param("startDate") LocalDate startDate,
                                             @Param("endDate") LocalDate endDate);
+
+
 }

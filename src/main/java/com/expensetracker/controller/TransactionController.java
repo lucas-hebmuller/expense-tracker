@@ -1,5 +1,6 @@
 package com.expensetracker.controller;
 
+import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.model.Transaction;
 import com.expensetracker.service.TransactionService;
@@ -59,5 +60,14 @@ public class TransactionController {
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/summary/monthly")
+    public ResponseEntity<MonthlySummaryDTO> getMonthlySummary(
+            @RequestParam Long userId,
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        MonthlySummaryDTO summary = transactionService.getMonthlySummary(userId, year, month);
+        return ResponseEntity.ok(summary);
     }
 }

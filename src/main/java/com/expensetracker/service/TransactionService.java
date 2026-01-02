@@ -1,5 +1,6 @@
 package com.expensetracker.service;
 
+import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.exception.UnauthorizedCategoryAccessException;
@@ -11,6 +12,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.Year;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -90,5 +93,33 @@ public class TransactionService {
                 .orElseThrow(() -> new TransactionNotFoundException(id));
 
         transactionRepository.delete(transaction);
+    }
+
+    public MonthlySummaryDTO getMonthlySummary(Long userId, Integer year, Integer month) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        if (year == null || year < Year.now().getValue() - 100 || year > Year.now().getValue() + 100) {
+            throw new IllegalArgumentException("Year must be within a range of 100 years from now.");
+        }
+
+        if (month == null || month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+
+        MonthlySummaryDTO summary = transactionRepository.getMonthlySummary(userId, year, month);
+
+        if (summary == null) {
+            summary = new MonthlySummaryDTO(
+                    year,
+                    month,
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    0
+            );
+        }
+
+        return summary;
     }
 }

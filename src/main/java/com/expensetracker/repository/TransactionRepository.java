@@ -1,5 +1,6 @@
 package com.expensetracker.repository;
 
+import com.expensetracker.dto.CategorySummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,4 +37,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                         @Param("year") Integer year,
                                         @Param("month") Integer month);
 
+    @Query("SELECT new com.expensetracker.dto.CategorySummaryDTO(" +
+            "c.id, c.name, SUM(t.amount), COUNT(t)) " +
+            "FROM Transaction t " +
+            "JOIN t.category c " +
+            "WHERE t.user.id = :userId " +
+            "GROUP BY c.id, c.name " +
+            "ORDER BY SUM(t.amount) DESC")
+    List<CategorySummaryDTO> getCategorySummary(@Param("userId") Long userId);
 }

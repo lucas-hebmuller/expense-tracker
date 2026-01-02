@@ -1,5 +1,6 @@
 package com.expensetracker.service;
 
+import com.expensetracker.dto.CategorySummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.TransactionNotFoundException;
@@ -105,7 +106,7 @@ public class TransactionService {
         }
 
         if (month == null || month < 1 || month > 12) {
-            throw new IllegalArgumentException("Month must be between 1 and 12");
+            throw new IllegalArgumentException("Month must be between 1 and 12.");
         }
 
         MonthlySummaryDTO summary = transactionRepository.getMonthlySummary(userId, year, month);
@@ -121,5 +122,15 @@ public class TransactionService {
         }
 
         return summary;
+    }
+
+    public List<CategorySummaryDTO> getCategorySummary(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        List<CategorySummaryDTO> summaries = transactionRepository.getCategorySummary(userId);
+
+        return summaries;
     }
 }

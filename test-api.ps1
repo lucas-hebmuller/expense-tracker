@@ -251,9 +251,9 @@ $body = @{
 
 try {
     Invoke-RestMethod -Uri "$baseUrl/api/transactions" -Method Post -Body $body -ContentType "application/json"
-    Write-Host "FAIL: Should have rejected missing amount" -ForegroundColor Red
+    Write-Host "FAIL: Should have rejected missing totalAmount" -ForegroundColor Red
 } catch {
-    Write-Host "SUCCESS: Validation caught missing amount" -ForegroundColor Yellow
+    Write-Host "SUCCESS: Validation caught missing totalAmount" -ForegroundColor Yellow
     $stream = $_.Exception.Response.GetResponseStream()
     $reader = New-Object System.IO.StreamReader($stream)
     $reader.ReadToEnd() | ConvertFrom-Json | ConvertTo-Json -Depth 5
@@ -263,7 +263,7 @@ try {
 Write-Host "`n--- Test 16: Future Date (400) ---" -ForegroundColor Cyan
 $body = @{
     description = "Future expense"
-    amount = "100.00"
+    totalAmount = "100.00"
     transactionDate = "2026-12-31"
     user = @{ id = 5 }
     category = @{ id = 6 }
@@ -283,7 +283,7 @@ try {
 Write-Host "`n--- Test 17: Valid Transaction (201) ---" -ForegroundColor Cyan
 $body = @{
     description = "Test transaction"
-    amount = "50.00"
+    totalAmount = "50.00"
     transactionDate = "2025-12-20"
     user = @{ id = 5 }
     category = @{ id = 6 }

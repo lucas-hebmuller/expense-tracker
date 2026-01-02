@@ -1,5 +1,6 @@
 package com.expensetracker.controller;
 
+import com.expensetracker.dto.CategorySummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.model.Transaction;
@@ -69,5 +70,11 @@ public class TransactionController {
             @RequestParam Integer month) {
         MonthlySummaryDTO summary = transactionService.getMonthlySummary(userId, year, month);
         return ResponseEntity.ok(summary);
+    }
+
+    @GetMapping("/summary/by-category")
+    public ResponseEntity<List<CategorySummaryDTO>> getCategorySummary(@RequestParam Long userId) {
+        List<CategorySummaryDTO> summaries = transactionService.getCategorySummary(userId);
+        return ResponseEntity.ok(summaries);
     }
 }

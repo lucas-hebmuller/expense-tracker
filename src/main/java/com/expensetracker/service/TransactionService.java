@@ -1,6 +1,7 @@
 package com.expensetracker.service;
 
 import com.expensetracker.dto.CategorySummaryDTO;
+import com.expensetracker.dto.DateRangeSummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.TransactionNotFoundException;
@@ -14,10 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.Year;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TransactionService {
@@ -133,4 +133,34 @@ public class TransactionService {
 
         return summaries;
     }
+
+    public DateRangeSummaryDTO getDateRangeSummary(Long userId, LocalDate startDate, LocalDate endDate) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        if (startDate == null || startDate.isAfter(LocalDate.now()) ||
+                endDate == null || endDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Dates cannot be null or in the future.");
+        }
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
+
+        DateRangeSummaryDTO summary = transactionRepository.getDateRangeSummary(userId, startDate, endDate);
+
+        if (summary == null) {
+            summary = new DateRangeSummaryDTO(
+                    startDate,
+                    endDate,
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    0L
+            );
+        }
+
+        return summary;
+    }
+
 }

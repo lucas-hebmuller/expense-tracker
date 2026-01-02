@@ -1,6 +1,7 @@
 package com.expensetracker.controller;
 
 import com.expensetracker.dto.CategorySummaryDTO;
+import com.expensetracker.dto.DateRangeSummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.model.Transaction;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -76,5 +78,14 @@ public class TransactionController {
     public ResponseEntity<List<CategorySummaryDTO>> getCategorySummary(@RequestParam Long userId) {
         List<CategorySummaryDTO> summaries = transactionService.getCategorySummary(userId);
         return ResponseEntity.ok(summaries);
+    }
+
+    @GetMapping("/summary/date-range")
+    public ResponseEntity<DateRangeSummaryDTO> getDateRangeSummary(
+            @RequestParam Long userId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) {
+        DateRangeSummaryDTO summary = transactionService.getDateRangeSummary(userId, startDate, endDate);
+        return ResponseEntity.ok(summary);
     }
 }

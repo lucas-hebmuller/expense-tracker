@@ -1,6 +1,7 @@
 package com.expensetracker.repository;
 
 import com.expensetracker.dto.CategorySummaryDTO;
+import com.expensetracker.dto.DateRangeSummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,4 +46,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "GROUP BY c.id, c.name " +
             "ORDER BY SUM(t.amount) DESC")
     List<CategorySummaryDTO> getCategorySummary(@Param("userId") Long userId);
+
+    @Query("SELECT new com.expensetracker.dto.DateRangeSummaryDTO(" +
+            ":startDate, " +
+            ":endDate, " +
+            "COALESCE(SUM(CASE WHEN t.amount > 0 THEN t.amount ELSE 0 END), 0), " +
+            "COALESCE(SUM(CASE WHEN t.amount < 0 THEN t.amount ELSE 0 END), 0), " +
+            "COUNT(t)) " +
+            "FROM Transaction t " +
+            "WHERE t.user.id = :userId " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    DateRangeSummaryDTO getDateRangeSummary(@Param("userId") Long userId,
+                                            @Param("startDate") LocalDate startDate,
+                                            @Param("endDate") LocalDate endDate);
 }

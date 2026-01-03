@@ -4,6 +4,8 @@ import com.expensetracker.dto.CategorySummaryDTO;
 import com.expensetracker.dto.DateRangeSummaryDTO;
 import com.expensetracker.dto.MonthlySummaryDTO;
 import com.expensetracker.model.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,13 +17,9 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findByUser_Id(Long userId);
+    Page<Transaction> findByUser_Id(Long userId, Pageable pageable);
 
-    List<Transaction> findByCategory_Id(Long categoryId);
-
-    List<Transaction> findByUser_IdAndTransactionDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
-
-    List<Transaction> findByUser_IdAndCategory_Id(Long userId, Long categoryId);
+    Page<Transaction> findByCategory_Id(Long categoryId, Pageable pageable);
 
     @Query("SELECT new com.expensetracker.dto.MonthlySummaryDTO(" +
             "EXTRACT(YEAR FROM t.transactionDate), " +

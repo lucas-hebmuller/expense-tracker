@@ -9,6 +9,10 @@ import com.expensetracker.model.Transaction;
 import com.expensetracker.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,20 +28,28 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = transactionService.getAllTransactions();
+    public ResponseEntity<Page<Transaction>> getAllTransactions(
+            @PageableDefault(size = 10, sort = "transactionDate", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        Page<Transaction> transactions = transactionService.getAllTransactions(pageable);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Transaction>> getTransactionsByUserId(@PathVariable Long userId) {
-        List<Transaction> transactions = transactionService.getTransactionsByUserId(userId);
+    public ResponseEntity<Page<Transaction>> getTransactionsByUserId(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10, sort = "transactionDate", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        Page<Transaction> transactions = transactionService.getTransactionsByUserId(userId, pageable);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<Transaction>> getTransactionsByCategoryId(@PathVariable Long categoryId) {
-        List<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryId);
+    public ResponseEntity<Page<Transaction>> getTransactionsByCategoryId(
+            @PathVariable Long categoryId,
+            @PageableDefault(size = 10, sort = "transactionDate", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        Page<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryId, pageable);
         return ResponseEntity.ok(transactions);
     }
 

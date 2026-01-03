@@ -13,6 +13,8 @@ import com.expensetracker.repository.CategoryRepository;
 import com.expensetracker.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -50,16 +52,16 @@ public class TransactionService {
         transaction.setCategory(category);
     }
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public Page<Transaction> getAllTransactions(Pageable pageable) {
+        return transactionRepository.findAll(pageable);
     }
 
-    public List<Transaction> getTransactionsByUserId(Long userId) {
-        return transactionRepository.findByUser_Id(userId);
+    public Page<Transaction> getTransactionsByUserId(Long userId, Pageable pageable) {
+        return transactionRepository.findByUser_Id(userId, pageable);
     }
 
-    public List<Transaction> getTransactionsByCategoryId(Long categoryId) {
-        return transactionRepository.findByCategory_Id(categoryId);
+    public Page<Transaction> getTransactionsByCategoryId(Long categoryId, Pageable pageable) {
+        return transactionRepository.findByCategory_Id(categoryId, pageable);
     }
 
     public Optional<Transaction> getTransactionById(Long id) {

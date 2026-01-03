@@ -60,5 +60,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                             @Param("startDate") LocalDate startDate,
                                             @Param("endDate") LocalDate endDate);
 
-
+    @Query("SELECT new com.expensetracker.dto.CategorySummaryDTO(" +
+            "c.id, c.name, SUM(t.amount), COUNT(t)) " +
+            "FROM Transaction t " +
+            "JOIN t.category c " +
+            "WHERE t.user.id = :userId " +
+            "AND EXTRACT(YEAR FROM t.transactionDate) = :year " +
+            "AND EXTRACT(MONTH FROM t.transactionDate) = :month " +
+            "GROUP BY c.id, c.name " +
+            "ORDER BY SUM(t.amount) ASC")
+    List<CategorySummaryDTO> getCategorySummaryByMonth(@Param("userId") Long userId,
+                                                       @Param("year") Integer year,
+                                                       @Param("month") Integer month);
 }

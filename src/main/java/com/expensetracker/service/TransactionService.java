@@ -187,8 +187,8 @@ public class TransactionService {
         MonthlySummaryDTO currentMonthSummary = getMonthlySummary(userId, currentYear, currentMonth);
         MonthlySummaryDTO lastMonthSummary = getMonthlySummary(userId, lastYear, lastMonth);
 
-        List<CategorySummaryDTO> categoriesSummary = getCategorySummary(userId);
-        CategorySummaryDTO topCategory = categoriesSummary.isEmpty() ? null : categoriesSummary.get(0);
+        List<CategorySummaryDTO> categoriesOfThisMonth = transactionRepository.getCategorySummaryByMonth(userId, currentYear, currentMonth);
+        CategorySummaryDTO topCategory = categoriesOfThisMonth.isEmpty() ? null : categoriesOfThisMonth.get(0);
 
         Integer transactionCount = currentMonthSummary.getTransactionCount();
 

@@ -3,7 +3,9 @@ package com.expensetracker.service;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.DuplicateCategoryException;
 import com.expensetracker.model.Category;
+import com.expensetracker.model.User;
 import com.expensetracker.repository.CategoryRepository;
+import com.expensetracker.security.SecurityUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,34 +33,42 @@ public class CategoryService {
 
     @Transactional
     public Category createCategory(Category category) {
-        if (category.getUser() == null || category.getUser().getId() == null) {
-            throw new IllegalArgumentException("Category must belong to a user!");
-        }
+        Long userId = SecurityUtil.getCurrentUserId();
+        User user = new User();
+        user.setId(userId);
+        category.setUser(user);
 
         if (categoryRepository.findByNameAndUser_Id(
                 category.getName(),
-                category.getUser().getId()).isPresent()) {
-            throw new DuplicateCategoryException(category.getName(), category.getUser().getId());
+                userId).isPresent()) {
+            throw new DuplicateCategoryException(category.getName(), userId);
         }
 
         return categoryRepository.save(category);
     }
 
     @Transactional
-    public Category updateCategory(Long id, Category categoryDetails) {
+    public Category updateCategory(Long id, Category categoryDetails, Long userId) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(()-> new CategoryNotFoundException(id));
 
+        if (!category.getUser().getId().equals(userId)) {
+            throw new CategoryNotFoundException(id);
+        }
+
         category.setName(categoryDetails.getName());
-        category.setUser(categoryDetails.getUser());
 
         return categoryRepository.save(category);
     }
 
     @Transactional
-    public void deleteCategory(Long id) {
+    public void deleteCategory(Long id, Long userId) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(()-> new CategoryNotFoundException(id));
+
+        if (!category.getUser().getId().equals(userId)) {
+            throw new CategoryNotFoundException(id);
+        }
 
         categoryRepository.delete(category);
     }

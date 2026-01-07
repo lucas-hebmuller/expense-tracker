@@ -9,8 +9,10 @@ import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.exception.UnauthorizedCategoryAccessException;
 import com.expensetracker.model.Category;
 import com.expensetracker.model.Transaction;
+import com.expensetracker.model.User;
 import com.expensetracker.repository.CategoryRepository;
 import com.expensetracker.repository.TransactionRepository;
+import com.expensetracker.security.SecurityUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,31 +72,47 @@ public class TransactionService {
 
     @Transactional
     public Transaction createTransaction(Transaction transaction) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        User user = new User();
+        user.setId(userId);
+        transaction.setUser(user);
+
         validateTransaction(transaction);
 
         return transactionRepository.save(transaction);
     }
 
     @Transactional
-    public Transaction updateTransaction(Long id, Transaction transactionDetails) {
+    public Transaction updateTransaction(Long id, Transaction transactionDetails, Long userId) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
+
+        if (!transaction.getUser().getId().equals(userId)) {
+            throw new TransactionNotFoundException(id);
+        }
+
+        User user = new User();
+        user.setId(userId);
+        transactionDetails.setUser(user);
 
         validateTransaction(transactionDetails);
 
         transaction.setDescription(transactionDetails.getDescription());
         transaction.setAmount(transactionDetails.getAmount());
         transaction.setTransactionDate(transactionDetails.getTransactionDate());
-        transaction.setUser(transactionDetails.getUser());
         transaction.setCategory(transactionDetails.getCategory());
 
         return transactionRepository.save(transaction);
     }
 
     @Transactional
-    public void deleteTransaction(Long id) {
+    public void deleteTransaction(Long id, Long userId) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
+
+        if (!transaction.getUser().getId().equals(userId)) {
+            throw new TransactionNotFoundException(id);
+        }
 
         transactionRepository.delete(transaction);
     }

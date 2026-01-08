@@ -29,7 +29,6 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
-    @NotNull(message = "Transaction must belong to a user!")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"categories", "transactions"}) // Prevents circular reference

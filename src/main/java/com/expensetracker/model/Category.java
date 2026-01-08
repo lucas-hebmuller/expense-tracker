@@ -18,7 +18,6 @@ public class Category {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @NotNull(message = "Category must belong to a user!")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"categories", "transactions"}) // Prevents circular reference

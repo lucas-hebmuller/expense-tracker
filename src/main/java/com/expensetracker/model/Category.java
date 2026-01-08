@@ -23,6 +23,10 @@ public class Category {
     @JsonIgnoreProperties({"categories", "transactions"}) // Prevents circular reference
     private User user;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     public Category() {}
 
     public Category(Long id, String name, User user) {
@@ -53,5 +57,13 @@ public class Category {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

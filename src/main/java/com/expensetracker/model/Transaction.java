@@ -43,6 +43,10 @@ public class Transaction {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     public Transaction() {}
 
     public Transaction(Long id, String description, BigDecimal amount,
@@ -114,5 +118,13 @@ public class Transaction {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

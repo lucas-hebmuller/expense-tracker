@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,6 +29,14 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
 
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+            .headers(headers -> headers
+                    .contentSecurityPolicy(csp ->
+                            csp.policyDirectives("default-src 'self'"))
+                    .frameOptions(frame -> frame.deny())
+                    .xssProtection(xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                    .contentTypeOptions(contentType -> contentType.disable())
+            )
 
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/**").permitAll()

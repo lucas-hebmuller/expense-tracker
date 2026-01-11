@@ -1,40 +1,50 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ===========================
+# Documentation (Private)
+# ===========================
+docs/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# ===========================
+# Backend (Java/Maven)
+# ===========================
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.idea/
+backend/*.iml
+backend/*.iws
+backend/.settings/
+backend/.classpath
+backend/.project
 
-### Environment Variables ###
+# ===========================
+# Frontend (Node/React)
+# ===========================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vscode/
+
+# ===========================
+# Environment Variables
+# ===========================
 .env
-.env.local
-
-### Application Properties with Secrets ###
+*.env.local
 **/application-local.properties
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# ===========================
+# OS Files
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# ===========================
+# IDE (Root level)
+# ===========================
 .vscode/
+.idea/
+*.iml
+
+# ===========================
+# Logs
+# ===========================
+*.log

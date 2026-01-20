@@ -1,1 +1,0 @@
-export const testMessage = "Path aliases working!";

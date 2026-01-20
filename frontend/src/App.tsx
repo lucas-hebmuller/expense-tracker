@@ -1,8 +1,4 @@
-import { testMessage } from '@/utils/test'; // Using @ alias
-
-function App() {
-  console.log(testMessage);
-  
+function App() {  
   return (
     <div>
       <h1>Expense Tracker</h1>

@@ -1,0 +1,57 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+interface AuthState {
+  token: string | null;
+  userId: number | null;
+  email: string | null;
+  name: string | null;
+  isAuthenticated: boolean;
+
+  login: (token: string, userId: number, email: string, name: string) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      token: null,
+      userId: null,
+      email: null,
+      name: null,
+      isAuthenticated: false,
+
+      login: (token, userId, email, name) => {
+        localStorage.setItem("token", token);
+        set({
+          token,
+          userId,
+          email,
+          name,
+          isAuthenticated: true,
+        });
+      },
+
+      logout: () => {
+        localStorage.removeItem("token");
+        set({
+          token: null,
+          userId: null,
+          email: null,
+          name: null,
+          isAuthenticated: false,
+        });
+      },
+    }),
+    {
+      name: "auth-storage",
+      partialize: (state) => ({
+        token: state.token,
+        userId: state.userId,
+        email: state.email,
+        name: state.name,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
+);

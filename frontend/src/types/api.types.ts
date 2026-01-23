@@ -6,7 +6,7 @@ export interface ApiError {
   path: string;
 }
 
-export interface ValidatonError {
+export interface ValidationError {
   timestamp: string;
   status: number;
   error: string;

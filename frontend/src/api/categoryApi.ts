@@ -2,7 +2,7 @@ import API from "./axiosConfig";
 import {
   type Category,
   type CategoryCreateRequest,
-} from "../types/category.types";
+} from "@/types/category.types";
 
 export const categoryApi = {
   getAll: async (): Promise<Category[]> => {

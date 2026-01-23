@@ -3,7 +3,7 @@ import {
   type AuthResponse,
   type LoginRequest,
   type RegisterRequest,
-} from "../types/auth.types";
+} from "@/types/auth.types";
 
 export const authApi = {
   register: async (data: RegisterRequest): Promise<AuthResponse> => {

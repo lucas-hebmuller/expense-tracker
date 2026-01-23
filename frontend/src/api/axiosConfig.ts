@@ -1,5 +1,5 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
-import type { ApiError } from "../types/api.types";
+import type { ApiError } from "@/types/api.types";
 
 const API = axios.create({
   baseURL: "http://localhost:8080/api",

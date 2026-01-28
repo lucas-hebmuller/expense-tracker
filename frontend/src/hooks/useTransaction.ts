@@ -31,6 +31,22 @@ export const useCreateTransaction = () => {
   });
 };
 
+export const useUpdateTransaction = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    Transaction,
+    AxiosError<ApiError>,
+    { id: number; data: TransactionCreateRequest }
+  >({
+    mutationFn: ({ id, data }) => transactionApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+};
+
 export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
 

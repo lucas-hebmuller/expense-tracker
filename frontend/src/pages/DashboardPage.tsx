@@ -1,5 +1,5 @@
 import { useDashboard } from "@/hooks/useDashboard";
-import { useTransactions } from "@/hooks/useTransaction";
+import { useTransactions } from "@/hooks/useTransactions";
 import Navbar from "@/components/Navbar";
 import DashboardCard from "@/components/DashboardCard";
 import { formatCurrency } from "@/utils/formatCurrency";

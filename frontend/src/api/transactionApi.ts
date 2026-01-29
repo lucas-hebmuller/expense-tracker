@@ -11,7 +11,7 @@ import {
 export const transactionApi = {
     getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Transaction>> => {
         const response = await API.get<PaginatedResponse<Transaction>>("/transactions", {
-            params: {page, size, sort: "transactionDate, desc"},
+            params: {page, size, sort: "transactionDate,desc"},
         });
         return response.data;    
     },
@@ -36,7 +36,7 @@ export const transactionApi = {
     },
 
     getDashboard: async (): Promise<Dashboard> => {
-        const response = await API.get<Dashboard>("transactions/dashboard");
+        const response = await API.get<Dashboard>("/transactions/dashboard");
         return response.data;
     },
 

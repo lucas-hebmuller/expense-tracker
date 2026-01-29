@@ -128,7 +128,7 @@ function TransactionPage() {
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page >= transactionsPage.totalPages - 1}
-                className="btn-seconday"
+                className="btn-secondary"
               >
                 Next
               </button>
@@ -155,7 +155,7 @@ function TransactionPage() {
         </div>
       )}
 
-      {/* Edit Trnsaction Modal */}
+      {/* Edit Transaction Modal */}
       {editingTransaction && (
         <div
           className="modal-overlay"
@@ -174,6 +174,15 @@ function TransactionPage() {
       )}
 
       {/* Delete Confirmation */}
+      {deletingTransaction && (
+        <ConfirmDialog 
+          title="Delete Transaction"
+          message={`Are you sure you want to delete ${deletingTransaction.description || "this transaction"}?`}
+          onConfirm={handleDelete}
+          onCancel={() => setDeletingTransaction(null)}
+          isLoading={deleteMutation.isPending}
+        />
+      )}
     </div>
   );
 }

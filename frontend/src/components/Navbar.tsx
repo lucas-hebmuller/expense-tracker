@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 
 function Navbar() {
@@ -12,7 +12,14 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <h1>Expense Tracker</h1>
+      <div className="navbar-left">
+        <h1>Expense Tracker</h1>
+        <div className="navbar-links">
+          <Link to="/">Dashboard</Link>
+          <Link to="/transactions">Transactions</Link>
+        </div>
+      </div>
+
       <div className="navbar-user">
         <span>Welcome, {name}</span>
         <button onClick={handleLogout}>Logout</button>

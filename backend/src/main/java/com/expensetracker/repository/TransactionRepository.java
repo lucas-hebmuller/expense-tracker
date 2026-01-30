@@ -21,6 +21,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     Page<Transaction> findByCategory_Id(Long categoryId, Pageable pageable);
 
+    long countByCategory_Id(Long categoryId);
+
     @Query("SELECT new com.expensetracker.dto.MonthlySummaryDTO(" +
             "EXTRACT(YEAR FROM t.transactionDate), " +
             "EXTRACT(MONTH FROM t.transactionDate), " +

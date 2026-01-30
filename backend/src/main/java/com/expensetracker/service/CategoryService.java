@@ -5,6 +5,7 @@ import com.expensetracker.exception.DuplicateCategoryException;
 import com.expensetracker.model.Category;
 import com.expensetracker.model.User;
 import com.expensetracker.repository.CategoryRepository;
+import com.expensetracker.repository.TransactionRepository;
 import com.expensetracker.security.SecurityUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
@@ -68,6 +72,15 @@ public class CategoryService {
 
         if (!category.getUser().getId().equals(userId)) {
             throw new CategoryNotFoundException(id);
+        }
+
+        long transactionCount = transactionRepository.countByCategory_Id(id);
+        if (transactionCount > 0) {
+            throw new IllegalStateException(
+                    "Cannot delete category '" + category.getName() + "' because it has " +
+                    transactionCount + " transaction(s). " +
+                    "Please delete or reassign the transaction(s) first."
+            );
         }
 
         categoryRepository.delete(category);

@@ -202,7 +202,8 @@ a:hover {
   font-size: 14px;
 }
 
-.transaction-form {
+.transaction-form,
+.category-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -543,6 +544,47 @@ a:hover {
 }
 
 /* ===========================
+   CATEGORY GRID
+   =========================== */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.category-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+
+.category-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.category-info h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.category-meta {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+}
+
+.category-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ===========================
    MODALS
    =========================== */
 .modal-overlay {
@@ -717,6 +759,21 @@ a:hover {
 
   .pagination {
     flex-direction: column;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .category-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 

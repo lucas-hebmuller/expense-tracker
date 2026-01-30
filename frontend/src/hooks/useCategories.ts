@@ -22,6 +22,21 @@ export const useCreateCategory = () => {
   });
 };
 
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    Category,
+    AxiosError<ApiError>,
+    { id: number; data: CategoryCreateRequest }
+  >({
+    mutationFn: ({ id, data }) => categoryApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
+
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
 

@@ -432,6 +432,62 @@ a:hover {
 }
 
 /* ===========================
+   COMPARISON CARDS
+   =========================== */
+.card-comparison {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.comparison-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.comparison-badge.positive {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.comparison-badge.negative {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.comparison-text {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ===========================
+   CHARTS GRID
+   =========================== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.chart-section-large {
+  grid-column: span 1;
+}
+
+/* ===========================
+   DASHBOARD BOTTOM
+   =========================== */
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 30px;
+}
+
+/* ===========================
    DASHBOARD CONTENT (Charts & Transactions)
    =========================== */
 .dashboard-content {
@@ -475,6 +531,77 @@ a:hover {
   color: #999;
   text-align: center;
   font-size: 14px;
+}
+
+/* ===========================
+   TOP CATEGORIES WIDGET
+   =========================== */
+.top-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.top-category-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.category-rank {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.category-details {
+  flex: 1;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.category-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.category-amount {
+  font-weight: 600;
+  color: #ef4444;
+  font-size: 14px;
+}
+
+.category-bar {
+  height: 6px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.category-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.category-meta {
+  font-size: 12px;
+  color: #999;
 }
 
 /* ===========================
@@ -571,12 +698,6 @@ a:hover {
   font-size: 18px;
   color: #333;
   margin-bottom: 4px;
-}
-
-.category-meta {
-  font-size: 13px;
-  color: #999;
-  margin: 0;
 }
 
 .category-actions {
@@ -691,12 +812,34 @@ a:hover {
 /* ===========================
    RESPONSIVE DESIGN
    =========================== */
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-section-large {
+    grid-column: span 1;
+  }
+
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
   .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-bottom {
     grid-template-columns: 1fr;
   }
 

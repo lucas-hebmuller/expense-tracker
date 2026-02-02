@@ -1,9 +1,14 @@
 import { useDashboard } from "@/hooks/useDashboard";
 import { useTransactions } from "@/hooks/useTransactions";
 import Navbar from "@/components/Navbar";
-import DashboardCard from "@/components/DashboardCard";
-import { formatCurrency } from "@/utils/formatCurrency";
 import RecentTransactions from "@/components/RecentTransactions";
+import { useMonthlyTrend } from "@/hooks/useMonthlyTrend";
+import { useQuery } from "@tanstack/react-query";
+import { transactionApi } from "@/api/transactionApi";
+import ComparisonCard from "@/components/ComparisonCard";
+import MonthlyTrendChart from "@/components/MonthlyTrendChart";
+import CategoryPieChart from "@/components/CategoryPieChart";
+import TopCategoriesWidget from "@/components/TopCategoriesWidget";
 
 function DashboardPage() {
   const {
@@ -14,6 +19,13 @@ function DashboardPage() {
 
   const { data: transactionsPage, isLoading: transactionsLoading } =
     useTransactions(0, 5);
+
+  const { data: trendData, isLoading: trendLoading } = useMonthlyTrend(6);
+
+  const { data: categorySummary } = useQuery({
+    queryKey: ["category-summary"],
+    queryFn: () => transactionApi.getCategorySummary(),
+  });
 
   if (dashboardLoading) {
     return (
@@ -51,7 +63,7 @@ function DashboardPage() {
   }
 
   const currentMonth = dashboard.currentMonth;
-  const netAmount = currentMonth.totalIncome + currentMonth.totalExpenses;
+  const lastMonth = dashboard.lastMonth;
 
   return (
     <div>
@@ -60,39 +72,74 @@ function DashboardPage() {
       <main className="main-content">
         <h2>Dashboard</h2>
 
+        {/* Comparison Cards */}
         <div className="dashboard-grid">
-          <DashboardCard
+          <ComparisonCard
             title="Total Income"
-            value={formatCurrency(currentMonth.totalIncome)}
-            subtitle="This month"
+            currentValue={currentMonth.totalIncome}
+            previousValue={lastMonth.totalIncome}
             type="income"
           />
-          <DashboardCard
+          <ComparisonCard
             title="Total Expenses"
-            value={formatCurrency(Math.abs(currentMonth.totalExpenses))}
-            subtitle="This month"
+            currentValue={Math.abs(currentMonth.totalExpenses)}
+            previousValue={Math.abs(lastMonth.totalExpenses)}
             type="expense"
           />
-          <DashboardCard
+          <ComparisonCard
             title="Net Balance"
-            value={formatCurrency(netAmount)}
-            subtitle="This month"
+            currentValue={currentMonth.netAmount}
+            previousValue={lastMonth.netAmount}
             type="balance"
           />
-          <DashboardCard
-            title="Transactions"
-            value={currentMonth.transactionCount.toString()}
-            subtitle="This month"
-            type="default"
-          />
+          <div className="dashboard-card">
+            <h3>Transactions</h3>
+            <p className="card-value">{currentMonth.transactionCount}</p>
+            <p className="card-subtitle">This month</p>
+          </div>
         </div>
 
-        <div className="dashboard-section">
-          <h3>Recent Transactions</h3>
-          <RecentTransactions
-            transactionsPage={transactionsPage}
-            isLoading={transactionsLoading}
-          />
+        {/* Charts Section */}
+        <div className="charts-grid">
+          <div className="dashboard-section chart-section-large">
+            <h3>6-Month Trend</h3>
+            {trendLoading ? (
+              <p>Loading trend data...</p>
+            ) : trendData && trendData.length > 0 ? (
+              <MonthlyTrendChart data={trendData} />
+            ) : (
+              <p className="section-empty">No trend data available</p>
+            )}
+          </div>
+
+          <div className="dashboard-section">
+            <h3>Spending by Category</h3>
+            {categorySummary && categorySummary.length > 0 ? (
+              <CategoryPieChart data={categorySummary} />
+            ) : (
+              <p className="section-empty">No spending data yet</p>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="dashboard-bottom">
+          <div className="dashboard-section">
+            <h3>Top 5 Spending Categories</h3>
+            {categorySummary && categorySummary.length > 0 ? (
+              <TopCategoriesWidget data={categorySummary} limit={5} />
+            ) : (
+              <p className="section-empty">No spending data yet</p>
+            )}
+          </div>
+
+          <div className="dashboard-section">
+            <h3>Recent Transactions</h3>
+            <RecentTransactions
+              transactionsPage={transactionsPage}
+              isLoading={transactionsLoading}
+            />
+          </div>
         </div>
       </main>
     </div>

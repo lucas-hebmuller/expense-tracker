@@ -1,5 +1,6 @@
 package com.expensetracker.service;
 
+import com.expensetracker.exception.DuplicateCategoryException;
 import com.expensetracker.model.Category;
 import com.expensetracker.model.User;
 import com.expensetracker.repository.CategoryRepository;
@@ -78,11 +79,61 @@ public class CategoryServiceTest {
 
     @Test
     void createCategory_WithDuplicateName_ShouldThrowException() {
+        // === ARRANGE ===
+        Long userId = 1L;
+        String categoryName = "Groceries";
 
+        Category inputCategory = new Category();
+        inputCategory.setName(categoryName);
+
+        // The existing category already in "DB"
+        User user = new User();
+        user.setId(userId);
+        Category existingCategory = new Category();
+        existingCategory.setId(1L);
+        existingCategory.setName(categoryName);
+        existingCategory.setUser(user);
+
+        try (MockedStatic<SecurityUtil> securityUtil = mockStatic(SecurityUtil.class)) {
+            securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(userId);
+
+            when(categoryRepository.findByNameAndUser_Id(categoryName, userId))
+                    .thenReturn(Optional.of(existingCategory));
+
+            // ===== ACT & ASSERT =====
+            assertThrows(DuplicateCategoryException.class, () -> {
+                categoryService.createCategory(inputCategory);
+            });
+
+            // Verify save was never called
+            verify(categoryRepository, never()).save(any(Category.class));
+        }
     }
 
     @Test
     void deleteCategory_WithExistingTransactions_ShouldThrowException() {
+        // === ARRANGE ===
+        Long userId = 1L;
+        String categoryName = "Groceries";
+        long transactionCount = 1;
 
+        // The existing category with transaction(s) in "DB"
+        User user = new User();
+        user.setId(userId);
+        Category existingCategory = new Category();
+        existingCategory.setId(1L);
+        existingCategory.setName(categoryName);
+        existingCategory.setUser(user);
+
+        try (MockedStatic<SecurityUtil> securityUtil = mockStatic(SecurityUtil.class)) {
+            securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(userId);
+
+            when(categoryRepository.findById(existingCategory.getId()))
+                    .thenReturn(Optional.of(existingCategory));
+
+            when(categoryRepository.countByCategory_Id)
+
+
+        }
     }
 }

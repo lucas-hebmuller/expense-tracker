@@ -1,5 +1,7 @@
 package com.expensetracker.service;
 
+import com.expensetracker.exception.CategoryHasTransactionsException;
+import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.DuplicateCategoryException;
 import com.expensetracker.model.Category;
 import com.expensetracker.model.User;
@@ -89,6 +91,7 @@ public class CategoryServiceTest {
         // The existing category already in "DB"
         User user = new User();
         user.setId(userId);
+
         Category existingCategory = new Category();
         existingCategory.setId(1L);
         existingCategory.setName(categoryName);
@@ -114,26 +117,91 @@ public class CategoryServiceTest {
     void deleteCategory_WithExistingTransactions_ShouldThrowException() {
         // === ARRANGE ===
         Long userId = 1L;
+        Long categoryId = 1L;
         String categoryName = "Groceries";
-        long transactionCount = 1;
 
         // The existing category with transaction(s) in "DB"
         User user = new User();
         user.setId(userId);
+
         Category existingCategory = new Category();
-        existingCategory.setId(1L);
+        existingCategory.setId(categoryId);
         existingCategory.setName(categoryName);
         existingCategory.setUser(user);
 
-        try (MockedStatic<SecurityUtil> securityUtil = mockStatic(SecurityUtil.class)) {
-            securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(userId);
+        when(categoryRepository.findById(categoryId))
+                .thenReturn(Optional.of(existingCategory));
 
-            when(categoryRepository.findById(existingCategory.getId()))
-                    .thenReturn(Optional.of(existingCategory));
+        when(transactionRepository.countByCategory_Id(categoryId))
+                .thenReturn(5L);
 
-            when(categoryRepository.countByCategory_Id)
+        // === ACT & ASSERT ===
+        CategoryHasTransactionsException exception = assertThrows(
+                CategoryHasTransactionsException.class,
+                () -> categoryService.deleteCategory(categoryId, userId)
+        );
 
+        // Verify the message contains useful info
+        assertTrue(exception.getMessage().contains("Groceries"));
+        assertTrue(exception.getMessage().contains("5"));
 
-        }
+        verify(categoryRepository, never()).delete(any(Category.class));
+    }
+
+    @Test
+    void deleteCategory_WithNoTransactions_ShouldSucceed() {
+        Long userId = 1L;
+        Long categoryId = 1L;
+        String categoryName = "Groceries";
+
+        User user = new User();
+        user.setId(userId);
+
+        Category existingCategory = new Category();
+        existingCategory.setId(categoryId);
+        existingCategory.setName(categoryName);
+        existingCategory.setUser(user);
+
+        when(categoryRepository.findById(categoryId))
+                .thenReturn(Optional.of(existingCategory));
+
+        when(transactionRepository.countByCategory_Id(categoryId))
+                .thenReturn(0L);
+
+        // ===== ACT =====
+        categoryService.deleteCategory(categoryId, userId);
+
+        // === ASSERT ===
+        verify(transactionRepository).countByCategory_Id(categoryId);
+        verify(categoryRepository).delete(existingCategory);
+    }
+
+    @Test
+    void deleteCategory_WithWrongUser_ShouldThrowException() {
+        // === ARRANGE ===
+        Long ownUserId = 1L;
+        Long wrongUserId = 2L;
+        Long categoryId = 1L;
+        String categoryName = "Groceries";
+
+        User user = new User();
+        user.setId(ownUserId);
+
+        Category existingCategory = new Category();
+        existingCategory.setId(categoryId);
+        existingCategory.setName(categoryName);
+        existingCategory.setUser(user);
+
+        when(categoryRepository.findById(categoryId))
+                .thenReturn(Optional.of(existingCategory));
+
+        // ===== ACT & ASSERT =====
+        assertThrows(
+            CategoryNotFoundException.class,
+            () -> categoryService.deleteCategory(categoryId, wrongUserId)
+        );
+
+        verify(transactionRepository, never()).countByCategory_Id(any());
+        verify(categoryRepository, never()).delete(any(Category.class));
     }
 }

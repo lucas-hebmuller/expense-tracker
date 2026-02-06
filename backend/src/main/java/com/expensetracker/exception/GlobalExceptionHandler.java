@@ -166,4 +166,18 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(CategoryHasTransactionsException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryHasTransactions(
+            CategoryHasTransactionsException ex,
+            WebRequest request) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
 }

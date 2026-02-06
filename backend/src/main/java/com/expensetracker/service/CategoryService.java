@@ -1,5 +1,6 @@
 package com.expensetracker.service;
 
+import com.expensetracker.exception.CategoryHasTransactionsException;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.DuplicateCategoryException;
 import com.expensetracker.model.Category;
@@ -76,11 +77,7 @@ public class CategoryService {
 
         long transactionCount = transactionRepository.countByCategory_Id(id);
         if (transactionCount > 0) {
-            throw new IllegalStateException(
-                    "Cannot delete category '" + category.getName() + "' because it has " +
-                    transactionCount + " transaction(s). " +
-                    "Please delete or reassign the transaction(s) first."
-            );
+            throw new CategoryHasTransactionsException(category.getName(), transactionCount);
         }
 
         categoryRepository.delete(category);

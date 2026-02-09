@@ -37,7 +37,7 @@ public class CategoryServiceTest {
     void createCategory_WithValidData_ShouldReturnSavedCategory() {
         // === ARRANGE ===
         //Set up test data
-        Long userId = 1l;
+        Long userId = 1L;
         String categoryName = "Groceries";
 
         // The category being passed in (no ID yet, no user yet)

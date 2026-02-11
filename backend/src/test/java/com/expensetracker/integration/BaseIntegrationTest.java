@@ -56,5 +56,4 @@ public class BaseIntegrationTest {
         categoryRepository.deleteAll();
         userRepository.deleteAll();
     }
-
 }

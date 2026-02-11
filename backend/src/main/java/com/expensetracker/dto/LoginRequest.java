@@ -12,9 +12,9 @@ public class LoginRequest {
     @NotBlank(message = "Password cannot be blank!")
     private String password;
 
-    LoginRequest() {}
+    public LoginRequest() {}
 
-    LoginRequest(String email, String password) {
+    public LoginRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }

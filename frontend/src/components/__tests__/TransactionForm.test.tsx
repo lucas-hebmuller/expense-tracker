@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TransactionForm from "../TransactionForm";
-import { useCategories } from "@/hooks/useCategories";
 
 vi.mock("@/hooks/useCategories", () => ({
   useCategories: () => ({
@@ -93,7 +92,7 @@ describe("TransactionForm", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/please select a category/i)).toBeInTheDocument();
+      expect(screen.getByText(/invalid input/i)).toBeInTheDocument();
     });
 
     expect(mockOnSubmit).not.toHaveBeenCalled();

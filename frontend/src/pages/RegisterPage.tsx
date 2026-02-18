@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +27,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 function RegisterPage() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -38,16 +40,20 @@ function RegisterPage() {
   const registerMutation = useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
     onSuccess: (response) => {
+      setErrorMessage(null);
       login(response.token, response.userId, response.email, response.name);
       navigate("/");
     },
     onError: (error: AxiosError<ValidationError>) => {
-      console.error("Registration failed: ", error.response?.data?.message);
+      setErrorMessage(
+        error.response?.data?.message || "Registration failed. Please try again."
+      );
     },
   });
 
   const onSubmit = (data: RegisterFormData) => {
     const { confirmPassword, ...registerData } = data;
+    setErrorMessage(null);
     registerMutation.mutate(registerData);
   };
 
@@ -56,10 +62,10 @@ function RegisterPage() {
       <div className="auth-card">
         <h1>Register</h1>
 
-        {registerMutation.isError && (
+        {errorMessage && (
           <div className="error-message">
-            {(registerMutation.error as AxiosError<ValidationError>)?.response
-              ?.data?.message || "Registration failed. Please try again."}
+            {errorMessage}
+            <button onClick={() => setErrorMessage(null)}>✕</button>
           </div>
         )}
 

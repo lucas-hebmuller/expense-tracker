@@ -13,7 +13,9 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <h1>Expense Tracker</h1>
+        <h1>
+          <Link to="/" className="navbar-brand">Expense Tracker</Link>
+        </h1>
         <div className="navbar-links">
           <Link to="/">Dashboard</Link>
           <Link to="/transactions">Transactions</Link>

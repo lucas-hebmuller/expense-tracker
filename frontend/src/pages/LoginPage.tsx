@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,6 +20,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 function LoginPage() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -31,15 +33,19 @@ function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (response) => {
+      setErrorMessage(null);
       login(response.token, response.userId, response.email, response.name);
       navigate("/");
     },
     onError: (error: AxiosError<ApiError>) => {
-      console.error("Login failed: ", error.response?.data?.message);
+      setErrorMessage(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
+    setErrorMessage(null);
     loginMutation.mutate(data);
   };
 
@@ -48,10 +54,10 @@ function LoginPage() {
       <div className="auth-card">
         <h1>Login</h1>
 
-        {loginMutation.isError && (
+        {errorMessage && (
           <div className="error-message">
-            {(loginMutation.error as AxiosError<ApiError>)?.response?.data
-              ?.message || "Login failed. Please try again."}
+            {errorMessage}
+            <button onClick={() => setErrorMessage(null)}>✕</button>
           </div>
         )}
 

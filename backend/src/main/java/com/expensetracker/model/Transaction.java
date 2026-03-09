@@ -17,6 +17,10 @@ public class Transaction {
     private Long id;
 
     @Size(max = 255, message = "Description cannot exceed 255 characters.")
+    @Pattern(
+            regexp = "^[^<>]*$",
+            message = "Description cannot contain < or > characters"
+    )
     @Column(length = 255)
     private String description;
 

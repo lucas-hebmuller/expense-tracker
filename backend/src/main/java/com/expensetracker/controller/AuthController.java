@@ -6,7 +6,9 @@ import com.expensetracker.dto.RegisterRequest;
 import com.expensetracker.exception.InvalidCredentialsException;
 import com.expensetracker.model.User;
 import com.expensetracker.security.JwtUtil;
+import com.expensetracker.security.LoginRateLimiter;
 import com.expensetracker.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private LoginRateLimiter loginRateLimiter;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -42,7 +47,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
+
+        String ip = httpRequest.getRemoteAddr();
+
+        if (!loginRateLimiter.isAllowed(ip)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
+        }
 
         User user = userService.getUserByEmail(request.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException());

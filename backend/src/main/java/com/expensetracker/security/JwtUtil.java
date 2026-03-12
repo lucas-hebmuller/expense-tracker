@@ -18,7 +18,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final long EXPIRATION_TIME = 1000 * 60 * 30; // milliseconds
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // milliseconds
 
     public String generateToken(Long userId, String email) {
         Map<String, Object> claims = new HashMap<>();

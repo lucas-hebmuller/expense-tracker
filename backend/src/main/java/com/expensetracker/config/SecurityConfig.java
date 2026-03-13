@@ -35,6 +35,7 @@ public class SecurityConfig {
                             csp.policyDirectives("default-src 'self'"))
                     .frameOptions(frame -> frame.deny())
                     .xssProtection(xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                    .contentTypeOptions(contentType -> contentType.disable())
             )
 
             .authorizeHttpRequests(auth -> auth

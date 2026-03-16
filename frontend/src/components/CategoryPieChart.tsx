@@ -9,6 +9,11 @@ interface CategoryPieChartProps {
   data: CategorySummary[];
 }
 
+const hashColor = (id: number) => {
+  const hue = (id * 137) % 360;
+  return `hsl(${hue}, 65%, 55%)`;
+}
+
 function CategoryPieChart({ data }: CategoryPieChartProps) {
   const expenses = data.filter((item) => item.totalAmount < 0);
 
@@ -26,18 +31,7 @@ function CategoryPieChart({ data }: CategoryPieChartProps) {
       {
         label: "Spending",
         data: expenses.map((item) => Math.abs(item.totalAmount)),
-        backgroundColor: [
-          "#3b82f6",
-          "#ef4444",
-          "#10b981",
-          "#f59e0b",
-          "#8b5cf6",
-          "#ec4899",
-          "#06b6d4",
-          "#f97316",
-          "#6366f1",
-          "#14b8a6",
-        ],
+        backgroundColor: expenses.map((item) => hashColor(item.categoryId)),
         borderWidth: 2,
         borderColor: "#fff",
       },

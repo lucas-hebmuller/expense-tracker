@@ -27,16 +27,16 @@ function CategoryPieChart({ data }: CategoryPieChartProps) {
         label: "Spending",
         data: expenses.map((item) => Math.abs(item.totalAmount)),
         backgroundColor: [
-          "#3b82f6", // Blue
-          "#ef4444", // Red
-          "#10b981", // Green
-          "#f59e0b", // Amber
-          "#8b5cf6", // Purple
-          "#ec4899", // Pink
-          "#06b6d4", // Cyan
-          "#f97316", // Orange
-          "#6366f1", // Indigo
-          "#14b8a6", // Teal
+          "#3b82f6",
+          "#ef4444",
+          "#10b981",
+          "#f59e0b",
+          "#8b5cf6",
+          "#ec4899",
+          "#06b6d4",
+          "#f97316",
+          "#6366f1",
+          "#14b8a6",
         ],
         borderWidth: 2,
         borderColor: "#fff",

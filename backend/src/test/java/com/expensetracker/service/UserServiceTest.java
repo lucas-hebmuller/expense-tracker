@@ -10,8 +10,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.expensetracker.model.Category;
+import com.expensetracker.repository.CategoryRepository;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,6 +34,12 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Captor
+    private ArgumentCaptor<List<Category>> categoriesCaptor;
 
     @Test
     void createUser_WithValidData_ShouldReturnSavedUser() {
@@ -256,5 +267,61 @@ public class UserServiceTest {
 
         assertTrue(result.isPresent());
         assertEquals("John Doe", result.get().getName());
+    }
+
+    @Test
+    void createUser_WithValidData_ShouldSeedDefaultCategories() {
+        User inputUser = new User();
+        inputUser.setName("John Doe");
+        inputUser.setEmail("john@example.com");
+        inputUser.setPassword("password123");
+
+        User savedUser = new User();
+        savedUser.setId(1L);
+        savedUser.setName("John Doe");
+        savedUser.setEmail("john@example.com");
+        savedUser.setPassword("encodedPassword123");
+
+        when(userRepository.findByEmail("john@example.com"))
+                .thenReturn(Optional.empty());
+        when(passwordEncoder.encode("password123"))
+                .thenReturn("encodedPassword123");
+        when(userRepository.save(any(User.class)))
+                .thenReturn(savedUser);
+
+        userService.createUser(inputUser);
+
+        verify(categoryRepository).saveAll(categoriesCaptor.capture());
+        List<Category> seeded = categoriesCaptor.getValue();
+
+        assertEquals(7, seeded.size());
+
+        List<String> names = seeded.stream().map(Category::getName).toList();
+        assertTrue(names.containsAll(List.of(
+                "Income", "Rent", "Groceries", "Transportation",
+                "Dining", "Entertainment", "Miscellaneous")));
+
+        assertTrue(seeded.stream().allMatch(c -> c.getUser().getId().equals(1L)));
+    }
+
+    @Test
+    void createUser_WithDuplicateEmail_ShouldNotSeedCategories() {
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingUser.setEmail("john@example.com");
+
+        User inputUser = new User();
+        inputUser.setName("Jane Doe");
+        inputUser.setEmail("john@example.com");
+        inputUser.setPassword("password123");
+
+        when(userRepository.findByEmail("john@example.com"))
+                .thenReturn(Optional.of(existingUser));
+
+        assertThrows(DuplicateEmailException.class, () -> {
+            userService.createUser(inputUser);
+        });
+
+        verify(categoryRepository, never()).saveAll(any());
     }
 }

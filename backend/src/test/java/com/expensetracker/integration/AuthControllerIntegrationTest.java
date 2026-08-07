@@ -2,12 +2,18 @@ package com.expensetracker.integration;
 
 import com.expensetracker.dto.LoginRequest;
 import com.expensetracker.dto.RegisterRequest;
+import com.expensetracker.model.Category;
+import com.expensetracker.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 
 public class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
@@ -75,5 +81,28 @@ public class AuthControllerIntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void register_ShouldSeedDefaultCategoriesForNewUser() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setName("John Doe");
+        request.setEmail("john@example.com");
+        request.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        User created = userRepository.findByEmail("john@example.com").orElseThrow();
+        List<Category> categories = categoryRepository.findByUser_Id(created.getId());
+
+        assertEquals(7, categories.size());
+
+        List<String> names = categories.stream().map(Category::getName).toList();
+        assertTrue(names.containsAll(List.of(
+                "Income", "Rent", "Groceries", "Transportation",
+                "Dining", "Entertainment", "Miscellaneous")));
     }
 }

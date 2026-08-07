@@ -2,7 +2,9 @@ package com.expensetracker.service;
 
 import com.expensetracker.exception.DuplicateEmailException;
 import com.expensetracker.exception.UserNotFoundException;
+import com.expensetracker.model.Category;
 import com.expensetracker.model.User;
+import com.expensetracker.repository.CategoryRepository;
 import com.expensetracker.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,13 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    private static final List<String> DEFAULT_CATEGORIES =
+            List.of("Income", "Rent", "Groceries", "Transportation",
+                    "Dining", "Entertainment", "Miscellaneous");
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -45,7 +54,14 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        List<Category> defaults = DEFAULT_CATEGORIES.stream()
+                .map(name -> new Category(null, name, saved))
+                .toList();
+        categoryRepository.saveAll(defaults);
+
+        return saved;
     }
 
     @Transactional

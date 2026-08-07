@@ -10,8 +10,14 @@ import type {
 const transactionSchema = z.object({
   description: z.string().min(1, "Description is required").max(255),
   amount: z.number().min(-1000000, "Amount too low").max(1000000, "Amount too high"),
-  transactionDate: z.string().min(1, "Date is required"),
-  categoryId: z.number().min(1, "Please select a category"),
+  transactionDate: z
+    .string()
+    .min(1, "Date is required")
+    .refine(
+      (value) => value <= new Date().toISOString().split("T")[0],
+      { message: "Date cannot be in the future" }
+    ),
+  categoryId: z.number().min(1, "Please select a category")
 });
 
 type TransactionFormData = z.infer<typeof transactionSchema>;

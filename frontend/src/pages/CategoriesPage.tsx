@@ -83,7 +83,6 @@ function CategoriesPage() {
               <div key={category.id} className="category-card">
                 <div className="category-info">
                   <h3>{category.name}</h3>
-                  <p className="category-meta">Category ID: {category.id}</p>
                 </div>
                 <div className="category-actions">
                   <button

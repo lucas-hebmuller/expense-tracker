@@ -1,11 +1,14 @@
 import { useNavigate, Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
 
 function Navbar() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { name, logout } = useAuthStore();
 
   const handleLogout = () => {
+    queryClient.clear();
     logout();
     navigate("/login");
   };

@@ -1,14 +1,15 @@
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
+import { isTokenValid } from "@/utils/token";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const token = useAuthStore((state) => state.token);
 
-  if (!isAuthenticated) {
+  if (!isTokenValid(token)) {
     return <Navigate to="/login" replace />;
   }
 

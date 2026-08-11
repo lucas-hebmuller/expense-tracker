@@ -42,7 +42,7 @@ function RegisterPage() {
     onSuccess: (response) => {
       setErrorMessage(null);
       login(response.token, response.userId, response.email, response.name);
-      navigate("/");
+      navigate("/dashboard");
     },
     onError: (error: AxiosError<ValidationError>) => {
       setErrorMessage(

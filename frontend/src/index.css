@@ -354,6 +354,68 @@ a:hover {
 }
 
 /* ===========================
+   DEMO BANNER
+   =========================== */
+.demo-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.demo-banner span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.demo-banner-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.demo-banner-actions a {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.demo-banner-actions a:first-child {
+  background-color: white;
+  color: #667eea;
+}
+
+.demo-banner-actions a:first-child:hover {
+  background-color: #f0f0ff;
+  text-decoration: none;
+}
+
+.demo-banner-actions a:last-child {
+  background-color: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.demo-banner-actions a:last-child:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .demo-banner {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* ===========================
    MAIN CONTENT
    =========================== */
 .main-content {

@@ -13,14 +13,14 @@ function LandingPage() {
   const token = useAuthStore((state) => state.token);
 
   if (isTokenValid(token)) {
-    return <Navigate to="/dashboard" replace/>;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
     <div>
       <div className="demo-banner">
         <span>You're viewing a sample dashboard</span>
-        <div>
+        <div className="demo-banner-actions">
           <Link to="/login">Log in</Link>
           <Link to="/register">Register</Link>
         </div>

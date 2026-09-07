@@ -35,7 +35,6 @@ function DashboardView({
     <main className="main-content">
       <h2>Dashboard</h2>
 
-      {/* Comparison Cards */}
       <div className="dashboard-grid">
         <ComparisonCard
           title="Total Income"
@@ -62,7 +61,6 @@ function DashboardView({
         </div>
       </div>
 
-      {/* Charts Section */}
       <div className="charts-grid">
         <div className="dashboard-section chart-section-large">
           <h3>6-Month Trend</h3>
@@ -85,7 +83,6 @@ function DashboardView({
         </div>
       </div>
 
-      {/* Bottom Section */}
       <div className="dashboard-bottom">
         <div className="dashboard-section">
           <h3>Top 5 Spending Categories</h3>

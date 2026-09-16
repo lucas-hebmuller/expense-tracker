@@ -13,14 +13,53 @@ public class PasswordResetToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"categories", "transactions"}) // Prevents circular reference
     private User user;
 
-    @Column
+    @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
+
+    public PasswordResetToken() {};
+
+    public PasswordResetToken(String token, User user, LocalDateTime expiresAt) {
+        this.token = token;
+        this.user = user;
+        this.expiresAt = expiresAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
+    }
 }

@@ -1,17 +1,18 @@
 package com.expensetracker.controller;
 
-import com.expensetracker.dto.AuthResponse;
-import com.expensetracker.dto.LoginRequest;
-import com.expensetracker.dto.RegisterRequest;
+import com.expensetracker.dto.*;
 import com.expensetracker.exception.InvalidCredentialsException;
 import com.expensetracker.model.User;
 import com.expensetracker.security.JwtUtil;
+import com.expensetracker.service.PasswordResetService;
 import com.expensetracker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,6 +23,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -61,5 +65,25 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        passwordResetService.requestPasswordReset(request.getEmail());
+
+        return ResponseEntity.ok(Map.of("message",
+                "If an account exists for that email, a reset link has been sent."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+
+        return ResponseEntity.ok(Map.of("message",
+                "Your password has been reset successfully."));
     }
 }

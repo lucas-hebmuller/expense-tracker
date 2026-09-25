@@ -7,6 +7,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import TransactionPage from "./pages/TransactionsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import LandingPage from "./pages/LandingPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
 
       {/* Protected routes */}
       <Route

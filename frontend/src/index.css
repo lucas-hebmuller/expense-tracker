@@ -279,6 +279,21 @@ a:hover {
   text-decoration: underline;
 }
 
+.forgot-password-link {
+  text-align: right;
+  margin: -8px 0 16px;
+  font-size: 13px;
+}
+
+.forgot-password-link a {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.forgot-password-link a:hover {
+  color: #3b82f6;
+}
+
 /* ===========================
    NAVBAR
    =========================== */
@@ -384,7 +399,9 @@ a:hover {
   padding: 6px 16px;
   border-radius: 4px;
   text-decoration: none;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .demo-banner-actions a:first-child {

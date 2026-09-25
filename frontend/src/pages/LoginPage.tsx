@@ -39,7 +39,7 @@ function LoginPage() {
     },
     onError: (error: AxiosError<ApiError>) => {
       setErrorMessage(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || "Login failed. Please try again.",
       );
     },
   });
@@ -87,6 +87,10 @@ function LoginPage() {
               <span className="field-error">{errors.password.message}</span>
             )}
           </div>
+
+          <p className="forgot-password-link">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </p>
 
           <button type="submit" disabled={loginMutation.isPending}>
             {loginMutation.isPending ? "Signing in..." : "Sign in"}

@@ -1,9 +1,11 @@
 package com.expensetracker.controller;
 
 import com.expensetracker.dto.*;
+import com.expensetracker.exception.EmailNotVerifiedException;
 import com.expensetracker.exception.InvalidCredentialsException;
 import com.expensetracker.model.User;
 import com.expensetracker.security.JwtUtil;
+import com.expensetracker.service.EmailVerificationService;
 import com.expensetracker.service.PasswordResetService;
 import com.expensetracker.service.UserService;
 import jakarta.validation.Valid;
@@ -27,22 +29,16 @@ public class AuthController {
     @Autowired
     private PasswordResetService passwordResetService;
 
+    @Autowired
+    private EmailVerificationService emailVerificationService;
+
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
         User user = new User(request.getName(), request.getEmail(), request.getPassword());
+        userService.createUser(user);
 
-        User createdUser = userService.createUser(user);
-
-        String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getEmail());
-
-        AuthResponse response = new AuthResponse(
-                token,
-                createdUser.getId(),
-                createdUser.getEmail(),
-                createdUser.getName()
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message",
+                "Registration successful. Please check your email to verify your account."));
     }
 
     @PostMapping("/login")
@@ -53,6 +49,10 @@ public class AuthController {
 
         if (!userService.verifyPassword(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException();
+        }
+
+        if(!user.isEmailVerified()) {
+            throw new EmailNotVerifiedException();
         }
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail());
@@ -85,5 +85,25 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message",
                 "Your password has been reset successfully."));
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<Map<String, String>> verifyEmail(
+            @Valid @RequestBody VerifyEmailRequest request) {
+
+        emailVerificationService.verifyEmail(request.getToken());
+
+        return ResponseEntity.ok(Map.of("message",
+                "Your email has been verified. You can now log in."));
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Map<String, String>> resendVerification(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        emailVerificationService.resendVerification(request.getEmail());
+
+        return ResponseEntity.ok(Map.of("message",
+                "If an unverified account exists for that email, a verification link has been sent."));
     }
 }

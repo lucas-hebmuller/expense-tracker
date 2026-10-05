@@ -26,6 +26,9 @@ public class UserService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private EmailVerificationService emailVerificationService;
+
     private static final List<String> DEFAULT_CATEGORIES =
             List.of("Income", "Rent", "Groceries", "Transportation",
                     "Dining", "Entertainment", "Miscellaneous");
@@ -60,6 +63,8 @@ public class UserService {
                 .map(name -> new Category(null, name, saved))
                 .toList();
         categoryRepository.saveAll(defaults);
+
+        emailVerificationService.sendVerificationEmail(saved);
 
         return saved;
     }

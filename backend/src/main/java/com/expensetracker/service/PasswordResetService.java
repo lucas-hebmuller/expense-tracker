@@ -70,6 +70,7 @@ public class PasswordResetService {
 
     @Transactional
     public void resetPassword(String token, String newPassword) {
+
         String hashedToken = tokenService.hashToken(token);
 
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(hashedToken)

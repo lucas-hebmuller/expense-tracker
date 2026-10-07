@@ -4,12 +4,14 @@ import {
   type ForgotPasswordRequest,
   type LoginRequest,
   type RegisterRequest,
+  type ResendVerificationRequest,
   type ResetPasswordRequest,
+  type VerifyEmailRequest,
 } from "@/types/auth.types";
 
 export const authApi = {
-  register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await API.post<AuthResponse>("/auth/register", data);
+  register: async (data: RegisterRequest) => {
+    const response = await API.post<{ message: string }>("/auth/register", data);
     return response.data;
   },
 
@@ -27,4 +29,14 @@ export const authApi = {
     const response = await API.post<{ message: string }>("/auth/reset-password", data);
     return response.data;
   },
+
+  verifyEmail: async (data: VerifyEmailRequest) => {
+    const response = await API.post<{ message: string }>("/auth/verify-email", data);
+    return response.data;
+  },
+
+  resendVerification: async (data: ResendVerificationRequest) => {
+    const response = await API.post<{ message: string }>("/auth/resend-verification", data);
+    return response.data;
+  }
 };

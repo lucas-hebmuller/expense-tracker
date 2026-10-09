@@ -21,10 +21,13 @@ function LoginPage() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showResend, setShowResend] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -41,11 +44,30 @@ function LoginPage() {
       setErrorMessage(
         error.response?.data?.message || "Login failed. Please try again.",
       );
+      if (error.response?.status === 403) {
+        setShowResend(true);
+      }
+    },
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: (email: string) => authApi.resendVerification({ email }),
+    onSuccess: () => {
+      setShowResend(false);
+      setErrorMessage(null);
+      setResendMessage(
+        "Verification email sent. Please check your inbox.",
+      );
+    },
+    onError: () => {
+      setResendMessage("Couldn't resend right now. Please try again.");
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
     setErrorMessage(null);
+    setShowResend(false);
+    setResendMessage(null);
     loginMutation.mutate(data);
   };
 
@@ -60,6 +82,21 @@ function LoginPage() {
             <button onClick={() => setErrorMessage(null)}>✕</button>
           </div>
         )}
+
+        {showResend && (
+          <p>
+            Didn't get the verification email?{" "}
+            <button
+              type="button"
+              onClick={() => resendMutation.mutate(getValues("email"))}
+              disabled={resendMutation.isPending}
+            >
+              {resendMutation.isPending ? "Sending..." : "Resend verification email"}
+            </button>
+          </p>
+        )}
+
+        {resendMessage && <p>{resendMessage}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-group">

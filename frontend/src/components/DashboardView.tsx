@@ -16,6 +16,7 @@ interface DashboardViewProps {
   trendData: MonthlySummary[] | undefined;
   trendLoading: boolean;
   categorySummary: CategorySummary[] | undefined;
+  monthlyCategorySummary: CategorySummary[] | undefined;
   transactionsPage: PaginatedResponse<Transaction> | undefined;
   transactionsLoading: boolean;
 }
@@ -25,11 +26,13 @@ function DashboardView({
   trendData,
   trendLoading,
   categorySummary,
+  monthlyCategorySummary,
   transactionsPage,
   transactionsLoading,
 }: DashboardViewProps) {
   const currentMonth = dashboard.currentMonth;
   const lastMonth = dashboard.lastMonth;
+  const monthLabel = new Date().toLocaleString("default", { month: "long", year: "numeric" });
 
   return (
     <main className="main-content">
@@ -74,11 +77,11 @@ function DashboardView({
         </div>
 
         <div className="dashboard-section">
-          <h3>Spending by Category</h3>
-          {categorySummary && categorySummary.length > 0 ? (
-            <CategoryPieChart data={categorySummary} />
+          <h3>Spending by Category - {monthLabel}</h3>
+          {monthlyCategorySummary && monthlyCategorySummary.length > 0 ? (
+            <CategoryPieChart data={monthlyCategorySummary} />
           ) : (
-            <p className="section-empty">No spending data yet</p>
+            <p className="section-empty">No spending recorded this month</p>
           )}
         </div>
       </div>

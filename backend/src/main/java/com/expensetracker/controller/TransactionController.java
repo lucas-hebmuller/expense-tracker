@@ -89,6 +89,15 @@ public class TransactionController {
         return ResponseEntity.ok(summaries);
     }
 
+    @GetMapping("/summary/by-category/monthly")
+    public ResponseEntity<List<CategorySummaryDTO>> getCategorySummaryByMonth(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        List<CategorySummaryDTO> summaries = transactionService.getCategorySummaryByMonth(userId, year, month);
+        return ResponseEntity.ok(summaries);
+    }
+
     @GetMapping("/summary/date-range")
     public ResponseEntity<DateRangeSummaryDTO> getDateRangeSummary(
             @RequestParam LocalDate startDate,

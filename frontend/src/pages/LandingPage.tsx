@@ -30,6 +30,7 @@ function LandingPage() {
         trendData={demoTrend}
         trendLoading={false}
         categorySummary={demoCategorySummary}
+        monthlyCategorySummary={demoCategorySummary}
         transactionsPage={demoTransactionsPage}
         transactionsLoading={false}
       />

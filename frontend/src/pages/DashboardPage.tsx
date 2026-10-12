@@ -23,6 +23,15 @@ function DashboardPage() {
     queryFn: () => transactionApi.getCategorySummary(),
   });
 
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // JS months are 0-indexed
+
+  const { data: monthlyCategorySummary } = useQuery({
+    queryKey: ["category-summary-monthly", year, month],
+    queryFn: () => transactionApi.getCategorySummaryByMonth(year, month),
+  });
+
   if (dashboardLoading) {
     return (
       <div>
@@ -67,6 +76,7 @@ function DashboardPage() {
         trendData={trendData}
         trendLoading={trendLoading}
         categorySummary={categorySummary}
+        monthlyCategorySummary={monthlyCategorySummary}
         transactionsPage={transactionsPage}
         transactionsLoading={transactionsLoading}
       />

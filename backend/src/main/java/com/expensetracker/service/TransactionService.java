@@ -155,6 +155,24 @@ public class TransactionService {
         return summaries;
     }
 
+    public List<CategorySummaryDTO> getCategorySummaryByMonth(Long userId, Integer year, Integer month) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        if (year == null || year < Year.now().getValue() - 100 || year > Year.now().getValue() + 100) {
+            throw new IllegalArgumentException("Year must be within a range of 100 years from now.");
+        }
+
+        if (month == null || month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12.");
+        }
+
+        List<CategorySummaryDTO> summaries = transactionRepository.getCategorySummaryByMonth(userId, year, month);
+
+        return summaries;
+    }
+
     public DateRangeSummaryDTO getDateRangeSummary(Long userId, LocalDate startDate, LocalDate endDate) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null.");

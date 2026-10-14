@@ -10,6 +10,7 @@ import type {
   PaginatedResponse,
   Transaction,
 } from "@/types/transaction.types";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 interface DashboardViewProps {
   dashboard: Dashboard;
@@ -32,7 +33,10 @@ function DashboardView({
 }: DashboardViewProps) {
   const currentMonth = dashboard.currentMonth;
   const lastMonth = dashboard.lastMonth;
-  const monthLabel = new Date().toLocaleString("default", { month: "long", year: "numeric" });
+  const monthLabel = new Date().toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <main className="main-content">
@@ -58,9 +62,13 @@ function DashboardView({
           type="balance"
         />
         <div className="dashboard-card">
-          <h3>Transactions</h3>
-          <p className="card-value">{currentMonth.transactionCount}</p>
-          <p className="card-subtitle">This month</p>
+          <h3>Total Balance</h3>
+          <p
+            className={`card-value ${dashboard.totalBalance >= 0 ? "amount-positive" : "amount-negative"}`}
+          >
+            {formatCurrency(dashboard.totalBalance)}
+          </p>
+          <p className="card-subtitle">All time</p>
         </div>
       </div>
 

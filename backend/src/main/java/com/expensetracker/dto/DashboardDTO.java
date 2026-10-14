@@ -1,20 +1,25 @@
 package com.expensetracker.dto;
 
+import java.math.BigDecimal;
+
 public class DashboardDTO {
 
     private MonthlySummaryDTO currentMonth;
     private MonthlySummaryDTO lastMonth;
     private CategorySummaryDTO topCategory;
     private Integer transactionCountThisMonth;
+    private BigDecimal totalBalance;
 
     public DashboardDTO() {}
 
     public DashboardDTO(MonthlySummaryDTO currentMonth, MonthlySummaryDTO lastMonth,
-                        CategorySummaryDTO topCategory, Integer transactionCountThisMonth) {
+                        CategorySummaryDTO topCategory, Integer transactionCountThisMonth,
+                        BigDecimal totalBalance) {
         this.currentMonth = currentMonth;
         this.lastMonth = lastMonth;
         this.topCategory = topCategory;
         this.transactionCountThisMonth = transactionCountThisMonth;
+        this.totalBalance = totalBalance;
     }
 
     public MonthlySummaryDTO getCurrentMonth() {
@@ -47,5 +52,13 @@ public class DashboardDTO {
 
     public void setTransactionCountThisMonth(Integer transactionCountThisMonth) {
         this.transactionCountThisMonth = transactionCountThisMonth;
+    }
+
+    public BigDecimal getTotalBalance() {
+        return totalBalance;
+    }
+
+    public void setTotalBalance(BigDecimal totalBalance) {
+        this.totalBalance = totalBalance;
     }
 }

@@ -56,6 +56,7 @@ export const demoDashboard: Dashboard = {
     transactionCount: 1,
   },
   transactionCountThisMonth: 23,
+  totalBalance: 10840,
 };
 
 export const demoTrend: MonthlySummary[] = [

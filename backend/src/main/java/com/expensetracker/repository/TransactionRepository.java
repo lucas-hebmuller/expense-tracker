@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -72,4 +73,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<CategorySummaryDTO> getCategorySummaryByMonth(@Param("userId") Long userId,
                                                        @Param("year") Integer year,
                                                        @Param("month") Integer month);
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user.id = :userId")
+    BigDecimal getTotalBalance(@Param("userId") Long userId);
 }

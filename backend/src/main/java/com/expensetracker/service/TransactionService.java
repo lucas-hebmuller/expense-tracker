@@ -230,11 +230,14 @@ public class TransactionService {
 
         Integer transactionCount = currentMonthSummary.getTransactionCount();
 
+        BigDecimal totalBalance = transactionRepository.getTotalBalance(userId);
+
         return new DashboardDTO(
                 currentMonthSummary,
                 lastMonthSummary,
                 topCategory,
-                transactionCount
+                transactionCount,
+                totalBalance
         );
     }
 

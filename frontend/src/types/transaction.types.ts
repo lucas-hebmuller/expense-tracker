@@ -42,6 +42,7 @@ export interface Dashboard {
   lastMonth: MonthlySummary;
   topCategory: CategorySummary | null;
   transactionCountThisMonth: number;
+  totalBalance: number;
 }
 
 export interface PaginatedResponse<T> {

@@ -241,4 +241,20 @@ public class TransactionService {
         );
     }
 
+    public Page<Transaction> getFilteredTransactions(Long userId, Long categoryId,
+                                                     LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
+
+        Page<Transaction> transactions = transactionRepository.findFiltered(userId, categoryId,
+                startDate, endDate, pageable);
+
+        return transactions;
+    }
+
 }

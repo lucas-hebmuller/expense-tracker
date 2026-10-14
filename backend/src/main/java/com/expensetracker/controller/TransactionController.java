@@ -30,10 +30,14 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<Page<Transaction>> getMyTransactions(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
             @PageableDefault(size = 10, sort = "transactionDate", direction = Sort.Direction.DESC)
             Pageable pageable) {
         Long userId = SecurityUtil.getCurrentUserId();
-        Page<Transaction> transactions = transactionService.getTransactionsByUserId(userId, pageable);
+        Page<Transaction> transactions = transactionService.getFilteredTransactions(userId, categoryId,
+                startDate, endDate, pageable);
         return ResponseEntity.ok(transactions);
     }
 

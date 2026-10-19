@@ -1,9 +1,6 @@
 package com.expensetracker.controller;
 
-import com.expensetracker.dto.CategorySummaryDTO;
-import com.expensetracker.dto.DashboardDTO;
-import com.expensetracker.dto.DateRangeSummaryDTO;
-import com.expensetracker.dto.MonthlySummaryDTO;
+import com.expensetracker.dto.*;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.model.Transaction;
 import com.expensetracker.security.SecurityUtil;
@@ -116,5 +113,15 @@ public class TransactionController {
         Long userId = SecurityUtil.getCurrentUserId();
         DashboardDTO dashboard = transactionService.getDashboardStats(userId);
         return ResponseEntity.ok(dashboard);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<FilteredSummaryDTO> getFilteredSummary(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        FilteredSummaryDTO summary = transactionService.getFilteredSummary(userId, categoryId, startDate, endDate);
+        return ResponseEntity.ok(summary);
     }
 }

@@ -11,12 +11,11 @@ public class FilteredSummaryDTO {
 
     public FilteredSummaryDTO() {}
 
-    public FilteredSummaryDTO(BigDecimal totalIncome, BigDecimal totalExpenses,
-                              BigDecimal netAmount, Integer transactionCount) {
-        this.totalIncome = totalIncome;
-        this.totalExpenses = totalExpenses;
-        this.netAmount = netAmount;
-        this.transactionCount = transactionCount;
+    public FilteredSummaryDTO(BigDecimal totalIncome, BigDecimal totalExpenses, Long transactionCount) {
+        this.totalIncome = totalIncome != null ? totalIncome : BigDecimal.ZERO;
+        this.totalExpenses = totalExpenses != null ? totalExpenses : BigDecimal.ZERO;
+        this.netAmount = this.totalIncome.add(this.totalExpenses);
+        this.transactionCount = transactionCount != null ? transactionCount.intValue() : 0;
     }
 
     public BigDecimal getTotalIncome() {

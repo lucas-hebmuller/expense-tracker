@@ -1,9 +1,6 @@
 package com.expensetracker.service;
 
-import com.expensetracker.dto.CategorySummaryDTO;
-import com.expensetracker.dto.DashboardDTO;
-import com.expensetracker.dto.DateRangeSummaryDTO;
-import com.expensetracker.dto.MonthlySummaryDTO;
+import com.expensetracker.dto.*;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.exception.UnauthorizedCategoryAccessException;
@@ -255,6 +252,22 @@ public class TransactionService {
                 startDate, endDate, pageable);
 
         return transactions;
+    }
+
+    public FilteredSummaryDTO getFilteredSummary(Long userId, Long categoryId,
+                                                 LocalDate startDate, LocalDate endDate) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null.");
+        }
+
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
+
+        FilteredSummaryDTO summary = transactionRepository.getFilteredSummary(userId, categoryId,
+                startDate, endDate);
+
+        return summary;
     }
 
 }

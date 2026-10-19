@@ -4,14 +4,20 @@ import type {
   Transaction,
   TransactionCreateRequest,
   PaginatedResponse,
+  TransactionFilters,
+  FilteredSummary,
 } from "@/types/transaction.types";
 import { AxiosError } from "axios";
 import type { ApiError } from "@/types/api.types";
 
-export const useTransactions = (page: number = 0, size: number = 10) => {
+export const useTransactions = (
+  page: number = 0,
+  size: number = 10,
+  filters: TransactionFilters = {},
+) => {
   return useQuery<PaginatedResponse<Transaction>, AxiosError<ApiError>>({
-    queryKey: ["transactions", page, size],
-    queryFn: () => transactionApi.getAll(page, size),
+    queryKey: ["transactions", page, size, filters],
+    queryFn: () => transactionApi.getAll(page, size, filters),
   });
 };
 
@@ -67,3 +73,10 @@ export const useDeleteTransaction = () => {
     },
   });
 };
+
+export const useFilteredSummary = (filters: TransactionFilters = {}) => {
+    return useQuery<FilteredSummary, AxiosError<ApiError>>({
+      queryKey: ["transaction-summary", filters],
+      queryFn: () => transactionApi.getFilteredSummary(filters)
+    })
+  }

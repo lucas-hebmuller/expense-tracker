@@ -55,3 +55,16 @@ export interface PaginatedResponse<T> {
   last: boolean;
   empty: boolean;
 }
+
+export interface TransactionFilters {
+  categoryId?: number;
+  startDate?: string; // "yyyy-MM-dd"
+  endDate?: string;   // "yyyy-MM-dd"
+}
+
+export interface FilteredSummary {
+  totalIncome: number;
+  totalExpenses: number;
+  netAmount: number;
+  transactionCount: number;
+}

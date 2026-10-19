@@ -6,17 +6,27 @@ import {
   type Dashboard,
   type MonthlySummary,
   type CategorySummary,
+  type TransactionFilters,
+  type FilteredSummary,
 } from "@/types/transaction.types";
 
 export const transactionApi = {
   getAll: async (
     page: number = 0,
     size: number = 10,
+    filters: TransactionFilters = {},
   ): Promise<PaginatedResponse<Transaction>> => {
     const response = await API.get<PaginatedResponse<Transaction>>(
       "/transactions",
       {
-        params: { page, size, sort: "transactionDate,desc" },
+        params: {
+          page,
+          size,
+          sort: "transactionDate,desc",
+          categoryId: filters.categoryId,
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+        },
       },
     );
     return response.data;
@@ -79,6 +89,19 @@ export const transactionApi = {
         params: { year, month },
       },
     );
+    return response.data;
+  },
+
+  getFilteredSummary: async (
+    filters: TransactionFilters = {},
+  ): Promise<FilteredSummary> => {
+    const response = await API.get<FilteredSummary>("/transactions/summary", {
+      params: {
+        categoryId: filters.categoryId,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      },
+    });
     return response.data;
   },
 };

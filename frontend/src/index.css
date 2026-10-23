@@ -842,6 +842,45 @@ a:hover {
 }
 
 /* ===========================
+   FILTERS
+   =========================== */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.filter-field select,
+.filter-field input {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #111;
+  background: #fff;
+}
+
+.filter-bar .btn-secondary {
+  margin-left: auto; /* pushes Clear to the far right; drop if you'd rather it sit inline */
+}
+
+/* ===========================
    EMPTY STATE
    =========================== */
 .empty-state {

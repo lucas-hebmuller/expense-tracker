@@ -10,7 +10,11 @@ import {
 } from "@/hooks/useTransactions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/dateHelpers";
-import type { Transaction } from "@/types/transaction.types";
+import type {
+  Transaction,
+  TransactionFilters,
+} from "@/types/transaction.types";
+import { useCategories } from "@/hooks/useCategories";
 
 function TransactionPage() {
   const [page, setPage] = useState(0);
@@ -19,8 +23,15 @@ function TransactionPage() {
     useState<Transaction | null>(null);
   const [deletingTransaction, setDeletingTransaction] =
     useState<Transaction | null>(null);
+  const [filters, setFilters] = useState<TransactionFilters>({});
 
-  const { data: transactionsPage, isLoading } = useTransactions(page, 10);
+  const { data: categories } = useCategories();
+
+  const { data: transactionsPage, isLoading, error } = useTransactions(
+    page,
+    10,
+    filters,
+  );
   const createMutation = useCreateTransaction();
   const updateMutation = useUpdateTransaction();
   const deleteMutation = useDeleteTransaction();
@@ -56,6 +67,15 @@ function TransactionPage() {
     }
   };
 
+  const updateFilters = (partial: Partial<TransactionFilters>) => {
+    setFilters((prev) => ({ ...prev, ...partial }));
+    setPage(0);
+  };
+
+  const hasActiveFilters = Boolean(
+    filters.categoryId || filters.startDate || filters.endDate,
+  );
+
   return (
     <div>
       <Navbar />
@@ -68,7 +88,65 @@ function TransactionPage() {
           </button>
         </div>
 
-        {isLoading ? (
+        <div className="filter-bar">
+          <label className="filter-field">
+            <span>Category</span>
+            <select
+              value={filters.categoryId ?? ""}
+              onChange={(e) =>
+                updateFilters({
+                  categoryId:
+                    e.target.value === "" ? undefined : Number(e.target.value),
+                })
+              }
+            >
+              <option value="">All categories</option>
+              {categories?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="filter-field">
+            <span>From</span>
+            <input
+              type="date"
+              value={filters.startDate ?? ""}
+              onChange={(e) =>
+                updateFilters({ startDate: e.target.value || undefined })
+              }
+            />
+          </label>
+
+          <label className="filter-field">
+            <span>To</span>
+            <input
+              type="date"
+              value={filters.endDate ?? ""}
+              onChange={(e) =>
+                updateFilters({ endDate: e.target.value || undefined })
+              }
+            />
+          </label>
+
+          <button
+            className="btn-secondary"
+            onClick={() => {
+              setFilters({});
+              setPage(0);
+            }}
+          >
+            Clear
+          </button>
+        </div>
+
+        {error ? (
+          <div className="error-message">
+            {error.response?.data?.message ?? "Failed to load transactions."}
+          </div>
+        ) : isLoading ? (
           <p>Loading transactions...</p>
         ) : transactionsPage && transactionsPage.content.length > 0 ? (
           <>
@@ -136,7 +214,9 @@ function TransactionPage() {
           </>
         ) : (
           <div className="empty-state">
-            <p>No transactions yet. Add your first one!</p>
+            {hasActiveFilters
+              ? "No transactions match these filters."
+              : "No transactions yet. Add your first one!"}
           </div>
         )}
       </main>
@@ -175,7 +255,7 @@ function TransactionPage() {
 
       {/* Delete Confirmation */}
       {deletingTransaction && (
-        <ConfirmDialog 
+        <ConfirmDialog
           title="Delete Transaction"
           message={`Are you sure you want to delete ${deletingTransaction.description || "this transaction"}?`}
           onConfirm={handleDelete}

@@ -80,8 +80,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId " +
             "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
-            "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
-            "AND (:endDate IS NULL OR t.transactionDate <= :endDate)")
+            "AND (CAST(:startDate AS date) IS NULL OR t.transactionDate >= :startDate) " +
+            "AND (CAST(:endDate AS date) IS NULL OR t.transactionDate <= :endDate)")
     Page<Transaction> findFiltered(@Param("userId") Long userId,
                                    @Param("categoryId") Long categoryId,
                                    @Param("startDate") LocalDate startDate,
@@ -95,8 +95,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "FROM Transaction t " +
             "WHERE t.user.id = :userId " +
             "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
-            "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
-            "AND (:endDate IS NULL OR t.transactionDate <= :endDate)")
+            "AND (CAST(:startDate AS date) IS NULL OR t.transactionDate >= :startDate) " +
+            "AND (CAST(:endDate AS date) IS NULL OR t.transactionDate <= :endDate)")
     FilteredSummaryDTO getFilteredSummary(@Param("userId") Long userId,
                                           @Param("categoryId") Long categoryId,
                                           @Param("startDate") LocalDate startDate,

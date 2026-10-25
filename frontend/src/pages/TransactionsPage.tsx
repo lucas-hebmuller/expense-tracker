@@ -7,6 +7,7 @@ import {
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
+  useFilteredSummary,
 } from "@/hooks/useTransactions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/dateHelpers";
@@ -27,14 +28,16 @@ function TransactionPage() {
 
   const { data: categories } = useCategories();
 
-  const { data: transactionsPage, isLoading, error } = useTransactions(
-    page,
-    10,
-    filters,
-  );
+  const {
+    data: transactionsPage,
+    isLoading,
+    error,
+  } = useTransactions(page, 10, filters);
   const createMutation = useCreateTransaction();
   const updateMutation = useUpdateTransaction();
   const deleteMutation = useDeleteTransaction();
+
+  const { data: summary } = useFilteredSummary(filters);
 
   const handleCreate = (data: any) => {
     createMutation.mutate(data, {
@@ -150,6 +153,18 @@ function TransactionPage() {
           <p>Loading transactions...</p>
         ) : transactionsPage && transactionsPage.content.length > 0 ? (
           <>
+            {summary && (
+              <div className="filter-summary">
+                <span className="filter-summary-label">
+                  Net for current filter
+                </span>
+                <span
+                  className={`filter-summary-amount ${summary.netAmount >= 0 ? "amount-positive" : "amount-negative"}`}
+                >
+                  {formatCurrency(summary.netAmount)}
+                </span>
+              </div>
+            )}
             <div className="transaction-list">
               {transactionsPage.content.map((transaction) => (
                 <div key={transaction.id} className="transaction-item">

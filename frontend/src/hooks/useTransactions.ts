@@ -36,6 +36,7 @@ export const useCreateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ["monthly-trend"] });
       queryClient.invalidateQueries({ queryKey: ["category-summary"] });
       queryClient.invalidateQueries({ queryKey: ["category-summary-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["transaction-summary"] });
     },
   });
 };
@@ -55,6 +56,7 @@ export const useUpdateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ["monthly-trend"] });
       queryClient.invalidateQueries({ queryKey: ["category-summary"] });
       queryClient.invalidateQueries({ queryKey: ["category-summary-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["transaction-summary"] });
     },
   });
 };
@@ -70,6 +72,7 @@ export const useDeleteTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ["monthly-trend"] });
       queryClient.invalidateQueries({ queryKey: ["category-summary"] });
       queryClient.invalidateQueries({ queryKey: ["category-summary-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["transaction-summary"] });
     },
   });
 };

@@ -247,4 +247,154 @@ public class TransactionControllerIntegrationTest extends BaseIntegrationTest{
         transaction.setUser(testUser);
         return transactionRepository.save(transaction);
     }
+
+    // ---------- Filtering: list endpoint ----------
+
+    @Test
+    void getTransactions_FilteredByCategory_ShouldReturnOnlyThatCategory() throws Exception {
+        Category salary = new Category();
+        salary.setName("Salary");
+        salary.setUser(testUser);
+        salary = categoryRepository.save(salary);
+
+        saveTransaction("Groceries 1", new BigDecimal("-50.00"), testCategory, LocalDate.now());
+        saveTransaction("Groceries 2", new BigDecimal("-30.00"), testCategory, LocalDate.now());
+        saveTransaction("Paycheck", new BigDecimal("2000.00"), salary, LocalDate.now());
+
+        mockMvc.perform(get("/api/transactions")
+                        .param("categoryId", testCategory.getId().toString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+    @Test
+    void getTransactions_FilteredByDateRange_ShouldReturnOnlyInRange() throws Exception {
+        // This is the 42P18 regression case: a date filter that would have thrown
+        // "could not determine data type" before the CAST fix.
+        saveTransaction("Old", new BigDecimal("-10.00"), testCategory, LocalDate.now().minusMonths(2));
+        saveTransaction("Mid", new BigDecimal("-20.00"), testCategory, LocalDate.now().minusMonths(1));
+        saveTransaction("New", new BigDecimal("-30.00"), testCategory, LocalDate.now());
+
+        LocalDate start = LocalDate.now().minusMonths(1).minusDays(3);
+        LocalDate end = LocalDate.now().minusMonths(1).plusDays(3);
+
+        mockMvc.perform(get("/api/transactions")
+                        .param("startDate", start.toString())
+                        .param("endDate", end.toString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].description").value("Mid"));
+    }
+
+    @Test
+    void getTransactions_FilteredByCategoryAndDate_ShouldReturnIntersection() throws Exception {
+        Category salary = new Category();
+        salary.setName("Salary");
+        salary.setUser(testUser);
+        salary = categoryRepository.save(salary);
+
+        saveTransaction("Match", new BigDecimal("-20.00"), testCategory, LocalDate.now().minusMonths(1));
+        saveTransaction("Wrong category", new BigDecimal("500.00"), salary, LocalDate.now().minusMonths(1));
+        saveTransaction("Out of range", new BigDecimal("-15.00"), testCategory, LocalDate.now().minusMonths(6));
+
+        LocalDate start = LocalDate.now().minusMonths(1).minusDays(3);
+        LocalDate end = LocalDate.now().minusMonths(1).plusDays(3);
+
+        mockMvc.perform(get("/api/transactions")
+                        .param("categoryId", testCategory.getId().toString())
+                        .param("startDate", start.toString())
+                        .param("endDate", end.toString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].description").value("Match"));
+    }
+
+    @Test
+    void getTransactions_NoFilters_ShouldReturnAll() throws Exception {
+        saveTransaction("One", new BigDecimal("-10.00"), testCategory, LocalDate.now());
+        saveTransaction("Two", new BigDecimal("-20.00"), testCategory, LocalDate.now());
+
+        mockMvc.perform(get("/api/transactions")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+// ---------- Filtered net summary endpoint ----------
+
+    @Test
+    void getFilteredSummary_WithNoFilters_ShouldReturnNetOverAll() throws Exception {
+        saveTransaction("Paycheck", new BigDecimal("1000.00"), testCategory, LocalDate.now());
+        saveTransaction("Groceries", new BigDecimal("-250.00"), testCategory, LocalDate.now());
+
+        mockMvc.perform(get("/api/transactions/summary")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalIncome").value(1000.00))
+                .andExpect(jsonPath("$.totalExpenses").value(-250.00))
+                .andExpect(jsonPath("$.netAmount").value(750.00))
+                .andExpect(jsonPath("$.transactionCount").value(2));
+    }
+
+    @Test
+    void getFilteredSummary_FilteredByCategory_ShouldReturnCategoryNet() throws Exception {
+        Category salary = new Category();
+        salary.setName("Salary");
+        salary.setUser(testUser);
+        salary = categoryRepository.save(salary);
+
+        saveTransaction("Groceries", new BigDecimal("-100.00"), testCategory, LocalDate.now());
+        saveTransaction("Paycheck", new BigDecimal("500.00"), salary, LocalDate.now());
+
+        mockMvc.perform(get("/api/transactions/summary")
+                        .param("categoryId", testCategory.getId().toString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.netAmount").value(-100.00))
+                .andExpect(jsonPath("$.transactionCount").value(1));
+    }
+
+    @Test
+    void getFilteredSummary_FilteredByDateRange_ShouldReturnRangeNet() throws Exception {
+        saveTransaction("Old", new BigDecimal("-10.00"), testCategory, LocalDate.now().minusMonths(2));
+        saveTransaction("Mid", new BigDecimal("-20.00"), testCategory, LocalDate.now().minusMonths(1));
+        saveTransaction("New", new BigDecimal("-30.00"), testCategory, LocalDate.now());
+
+        LocalDate start = LocalDate.now().minusMonths(1).minusDays(3);
+        LocalDate end = LocalDate.now().minusMonths(1).plusDays(3);
+
+        mockMvc.perform(get("/api/transactions/summary")
+                        .param("startDate", start.toString())
+                        .param("endDate", end.toString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.netAmount").value(-20.00))
+                .andExpect(jsonPath("$.transactionCount").value(1));
+    }
+
+    @Test
+    void getFilteredSummary_WithStartDateAfterEndDate_ShouldReturn400() throws Exception {
+        mockMvc.perform(get("/api/transactions/summary")
+                        .param("startDate", LocalDate.now().toString())
+                        .param("endDate", LocalDate.now().minusDays(10).toString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+    }
+
+// ---------- Helper ----------
+
+    private Transaction saveTransaction(String description, BigDecimal amount,
+                                        Category category, LocalDate date) {
+        Transaction transaction = new Transaction();
+        transaction.setDescription(description);
+        transaction.setAmount(amount);
+        transaction.setTransactionDate(date);
+        transaction.setCategory(category);
+        transaction.setUser(testUser);
+        return transactionRepository.save(transaction);
+    }
 }

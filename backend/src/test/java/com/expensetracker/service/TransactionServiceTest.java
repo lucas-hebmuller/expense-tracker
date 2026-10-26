@@ -1,8 +1,6 @@
 package com.expensetracker.service;
 
-import com.expensetracker.dto.CategorySummaryDTO;
-import com.expensetracker.dto.DateRangeSummaryDTO;
-import com.expensetracker.dto.MonthlySummaryDTO;
+import com.expensetracker.dto.*;
 import com.expensetracker.exception.CategoryNotFoundException;
 import com.expensetracker.exception.TransactionNotFoundException;
 import com.expensetracker.exception.UnauthorizedCategoryAccessException;
@@ -18,6 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -452,5 +454,99 @@ public class TransactionServiceTest {
         });
 
         verify(transactionRepository, never()).getDateRangeSummary(any(), any(), any());
+    }
+
+    // ---------- getFilteredTransactions ----------
+
+    @Test
+    void getFilteredTransactions_WithNullFilters_ShouldDelegateToRepository() {
+        Long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Transaction> expected = new PageImpl<>(List.of(new Transaction()));
+
+        when(transactionRepository.findFiltered(userId, null, null, null, pageable))
+                .thenReturn(expected);
+
+        Page<Transaction> result = transactionService.getFilteredTransactions(
+                userId, null, null, null, pageable);
+
+        assertEquals(1, result.getTotalElements());
+        verify(transactionRepository).findFiltered(userId, null, null, null, pageable);
+    }
+
+    @Test
+    void getFilteredTransactions_WithStartDateAfterEndDate_ShouldThrowException() {
+        Long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        LocalDate start = LocalDate.now();
+        LocalDate end = LocalDate.now().minusDays(10);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            transactionService.getFilteredTransactions(userId, null, start, end, pageable);
+        });
+
+        verify(transactionRepository, never()).findFiltered(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void getFilteredTransactions_WithNullUserId_ShouldThrowException() {
+        Pageable pageable = PageRequest.of(0, 10);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            transactionService.getFilteredTransactions(null, null, null, null, pageable);
+        });
+
+        verify(transactionRepository, never()).findFiltered(any(), any(), any(), any(), any());
+    }
+
+// ---------- getFilteredSummary ----------
+
+    @Test
+    void getFilteredSummary_WithValidData_ShouldReturnSummary() {
+        Long userId = 1L;
+        FilteredSummaryDTO expected = new FilteredSummaryDTO(
+                new BigDecimal("1000.00"), new BigDecimal("-250.00"), 2L);
+
+        when(transactionRepository.getFilteredSummary(userId, null, null, null))
+                .thenReturn(expected);
+
+        FilteredSummaryDTO result = transactionService.getFilteredSummary(userId, null, null, null);
+
+        assertNotNull(result);
+        assertEquals(new BigDecimal("750.00"), result.getNetAmount());
+        assertEquals(2, result.getTransactionCount());
+    }
+
+    @Test
+    void getFilteredSummary_WithStartDateAfterEndDate_ShouldThrowException() {
+        Long userId = 1L;
+        LocalDate start = LocalDate.now();
+        LocalDate end = LocalDate.now().minusDays(10);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            transactionService.getFilteredSummary(userId, null, start, end);
+        });
+
+        verify(transactionRepository, never()).getFilteredSummary(any(), any(), any(), any());
+    }
+
+// ---------- getDashboardStats ----------
+
+    @Test
+    void getDashboardStats_ShouldIncludeTotalBalance() {
+        Long userId = 1L;
+
+        when(transactionRepository.getMonthlySummary(eq(userId), any(), any()))
+                .thenReturn(null); // service fills a zero DTO
+        when(transactionRepository.getCategorySummaryByMonth(eq(userId), any(), any()))
+                .thenReturn(List.of());
+        when(transactionRepository.getTotalBalance(userId))
+                .thenReturn(new BigDecimal("4200.00"));
+
+        DashboardDTO result = transactionService.getDashboardStats(userId);
+
+        assertNotNull(result);
+        assertEquals(new BigDecimal("4200.00"), result.getTotalBalance());
+        verify(transactionRepository).getTotalBalance(userId);
     }
 }

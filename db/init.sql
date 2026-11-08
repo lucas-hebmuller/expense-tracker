@@ -1,0 +1,43 @@
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    email_verified BOOLEAN NOT NULL DEFAULT false
+);
+
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    user_id INTEGER NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE transactions (
+    id SERIAL PRIMARY KEY,
+    description VARCHAR(255),
+    amount DECIMAL(10,2) NOT NULL,
+    transaction_date DATE NOT NULL,
+    category_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    version BIGINT NOT NULL DEFAULT 0,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE password_reset_token (
+    id BIGSERIAL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE verification_token (
+    id BIGSERIAL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMP NOT NULL
+);

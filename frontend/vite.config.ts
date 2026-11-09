@@ -6,8 +6,11 @@ import path from "path";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
+    server: {
     port: 3000,
+    proxy: {
+      "/api": "http://localhost:8080",
+    },
   },
   resolve: {
     alias: {
